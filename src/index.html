@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>MetRix VPN</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@700;900&display=swap');
+
+  :root {
+    --bg:       #07080F;
+    --surface:  #0E1020;
+    --card:     #141629;
+    --border:   rgba(255,255,255,0.06);
+    --accent:   #6C63FF;
+    --accent2:  #00D4FF;
+    --green:    #00E5A0;
+    --red:      #FF4B6E;
+    --text:     #E8EAFF;
+    --muted:    #6B7099;
+    --radius:   clamp(14px, 4vw, 22px);
+    --nav-bg:   rgba(14,16,32,0.92);
+    --shadow:   rgba(0,0,0,0.4);
+
+    /* Responsive type scale */
+    --text-xs:   clamp(10px, 2.5vw, 13px);
+    --text-sm:   clamp(12px, 3vw,   15px);
+    --text-base: clamp(13px, 3.5vw, 16px);
+    --text-md:   clamp(15px, 4vw,   18px);
+    --text-lg:   clamp(18px, 5vw,   24px);
+    --text-xl:   clamp(22px, 6vw,   30px);
+
+    /* Responsive spacing */
+    --space-sm:  clamp(10px, 3vw,  16px);
+    --space-md:  clamp(16px, 4vw,  24px);
+    --space-lg:  clamp(20px, 5vw,  32px);
+
+    /* Orb size */
+    --orb-size:      clamp(160px, 45vw, 220px);
+    --orb-btn-size:  clamp(96px,  28vw, 130px);
+  }
+
+  :root.light {
+    --bg:       #F0F2FF;
+    --surface:  #E4E7FA;
+    --card:     #FFFFFF;
+    --border:   rgba(108,99,255,0.12);
+    --accent:   #6C63FF;
+    --accent2:  #0099CC;
+    --green:    #00B87A;
+    --red:      #E8355A;
+    --text:     #1A1B2E;
+    --muted:    #7B82A8;
+    --nav-bg:   rgba(240,242,255,0.95);
+    --shadow:   rgba(108,99,255,0.08);
+  }
+
+  /* ── THEME TOGGLE BTN ── */
+  .theme-toggle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .theme-toggle svg { width:16px; height:16px; transition: all 0.3s; }
+  .theme-toggle.light-active svg { transform: rotate(20deg); }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    transition: background 0.35s, color 0.35s;
+    /* prevent pull-to-refresh on Android */
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  /* Smooth theme transition on all elements */
+  *, *::before, *::after {
+    transition: background-color 0.35s, border-color 0.35s, color 0.25s, box-shadow 0.35s;
+  }
+  /* But don't slow down animations */
+  .orb-btn, .orb-outer, .orb-outer2, .orb-glow, .ping-dot, .speed-bar-fill,
+  .fade-up, .screen, .nav-item svg, .theme-toggle svg {
+    transition: unset;
+  }
+  .orb-btn { transition: transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s; }
+  .screen { transition: opacity 0.35s cubic-bezier(.4,0,.2,1), transform 0.35s cubic-bezier(.4,0,.2,1); }
+  .nav-item { transition: color 0.2s; }
+  .nav-item svg { transition: filter 0.3s, transform 0.3s; }
+  .theme-toggle svg { transition: transform 0.3s; }
+  .speed-bar-fill { transition: width 1.5s cubic-bezier(.4,0,.2,1); }
+
+  /* ── FULL SCREEN SHELL ── */
+  .phone-shell {
+    width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    background: var(--bg);
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(.4,0,.2,1), transform 0.35s cubic-bezier(.4,0,.2,1);
+    transform: translateX(30px);
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  /* push nav to bottom on short content */
+  .screen-content {
+    flex: 1;
+  }
+  .screen::-webkit-scrollbar { display:none; }
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(0);
+  }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    transition: background 0.35s;
+  }
+  .status-icons { display:flex; gap:6px; align-items:center; }
+  .status-icons svg { width:16px; height:16px; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: sticky;
+    bottom: 0;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 12px 0 calc(16px + env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 6px 0;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    font-family: inherit;
+  }
+  .nav-item svg { width:22px; height:22px; transition: all 0.3s; }
+  .nav-item.active { color: var(--accent); }
+  .nav-item.active svg { filter: drop-shadow(0 0 6px var(--accent)); transform: translateY(-2px); }
+
+  /* ── HOME SCREEN ── */
+  .home-header {
+    padding: 16px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    font-size: 18px;
+    font-weight: 900;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: clamp(15px, 4.5vw, 20px);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(108,99,255,0.35));
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff;
+    cursor: pointer;
+  }
+
+  /* ── RING LOADER BUTTON ── */
+  .orb-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px 24px;
+    gap: 24px;
+  }
+
+  .orb-ring {
+    position: relative;
+    width: var(--orb-size); height: var(--orb-size);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* SVG rings */
+  .ring-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    transform: rotate(-90deg);
+    pointer-events: none;
+  }
+  .ring-track {
+    fill: none;
+    stroke: rgba(108,99,255,0.1);
+    stroke-width: 3;
+    transition: stroke 0.5s;
+  }
+  :root.light .ring-track { stroke: rgba(108,99,255,0.15); }
+
+  .ring-fill {
+    fill: none;
+    stroke: url(#ringGrad);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 502;
+    stroke-dashoffset: 502;
+    transition: stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1);
+  }
+  .ring-fill2 {
+    fill: none;
+    stroke: url(#ringGrad2);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 553;
+    stroke-dashoffset: 553;
+    transition: stroke-dashoffset 1.9s cubic-bezier(.4,0,.2,1) 0.15s;
+  }
+  .ring-fill.spin {
+    stroke-dashoffset: 400;
+    animation: ring-spin 1.2s linear infinite;
+  }
+  @keyframes ring-spin {
+    to { stroke-dashoffset: -502; }
+  }
+
+  /* inner pulse ring */
+  .ring-pulse {
+    position: absolute;
+    inset: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(108,99,255,0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  .ring-pulse.active {
+    opacity: 1;
+    animation: ring-pulse-anim 2.4s ease-in-out infinite;
+  }
+  @keyframes ring-pulse-anim {
+    0%,100% { transform:scale(1); opacity:0.4; border-color: rgba(0,229,160,0.3); }
+    50% { transform:scale(1.06); opacity:0; border-color: rgba(0,229,160,0.6); }
+  }
+
+  /* center button */
+  .orb-btn {
+    position: relative;
+    width: var(--orb-btn-size); height: var(--orb-btn-size);
+    border-radius: 50%;
+    background: var(--card);
+    border: none;
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 7px;
+    z-index: 2;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.3), 0 6px 24px rgba(0,0,0,0.3);
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s;
+  }
+  .orb-btn:hover { transform: scale(1.04); }
+  .orb-btn:active { transform: scale(0.96); }
+
+  .orb-icon { width: 40px; height: 40px; display:flex; align-items:center; justify-content:center; }
+  .orb-icon svg { width: 40px; height: 40px; color: var(--accent); filter: drop-shadow(0 0 6px rgba(108,99,255,0.5)); transition: all 0.4s; }
+  .orb-btn.connected .orb-icon svg { color: var(--green); filter: drop-shadow(0 0 8px rgba(0,229,160,0.7)); }
+
+  .orb-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 1px; transition: color 0.3s; }
+  .orb-btn.connected .orb-label { color: var(--green); }
+
+  /* glow under ring */
+  .orb-glow {
+    position: absolute;
+    width: var(--orb-size); height: var(--orb-size);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 65%);
+    pointer-events: none;
+    transition: background 0.6s;
+  }
+  .orb-glow.green {
+    background: radial-gradient(circle, rgba(0,229,160,0.1) 0%, transparent 65%);
+  }
+
+  /* Status Label */
+  .conn-status {
+    text-align: center;
+  }
+  .conn-status-label {
+    font-size: var(--text-md);
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .conn-status-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .conn-timer {
+    font-size: var(--text-xl);
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--green);
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 24px 20px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stat-card-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .stat-card-label svg { width:13px; height:13px; }
+  .stat-card-value {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-card-value span { font-size: 12px; font-weight: 400; color: var(--muted); }
+
+  /* ── SELECTED SERVER ── */
+  .selected-server {
+    margin: 0 var(--space-md) 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .selected-server::before {
+    content:'';
+    position:absolute;
+    inset:0;
+    background: linear-gradient(135deg, rgba(108,99,255,0.04), transparent);
+    pointer-events:none;
+  }
+  .selected-server:hover { border-color: rgba(108,99,255,0.3); }
+  .flag svg { width:28px; height:28px; color: var(--accent2); }
+  .server-info { flex: 1; }
+  .server-arrow svg { width:16px; height:16px; }
+  .server-name { font-size: var(--text-base); font-weight: 600; }
+  .server-ping {
+    font-size: 12px;
+    color: var(--green);
+    margin-top: 2px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .ping-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: ping-blink 2s ease infinite;
+  }
+  @keyframes ping-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .server-arrow { color: var(--muted); }
+
+  /* ── SERVERS SCREEN ── */
+  .screen-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    padding: 16px 24px 0;
+  }
+  .search-bar {
+    margin: 16px var(--space-md);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  .search-bar svg { width:16px; height:16px; color: var(--muted); flex-shrink:0; }
+  .search-bar input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    width: 100%;
+    direction: rtl;
+  }
+  .search-bar input::placeholder { color: var(--muted); }
+
+  .region-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0 24px 10px;
+  }
+
+  .server-list { padding: 0 var(--space-md) 12px; display: flex; flex-direction: column; gap: 10px; }
+
+  .server-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .server-item:hover { border-color: rgba(108,99,255,0.3); transform: translateX(-2px); }
+  .server-item.selected { border-color: var(--accent); }
+  .server-item.selected::after {
+    content:'';
+    position:absolute;
+    right:0; top:0; bottom:0;
+    width:3px;
+    background: var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .server-flag { display:flex; align-items:center; justify-content:center; }
+  .server-flag svg { width:26px; height:26px; color: var(--accent2); }
+  .server-details { flex:1; }
+  .server-details-name { font-size: 14px; font-weight: 600; }
+  .server-details-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .server-ping-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: rgba(0,229,160,0.1);
+    color: var(--green);
+  }
+  .server-ping-badge.medium {
+    background: rgba(255,165,0,0.1);
+    color: #FFA500;
+  }
+  .server-ping-badge.slow {
+    background: rgba(255,75,110,0.1);
+    color: var(--red);
+  }
+  .pro-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── PLANS SCREEN ── */
+  .plans-header {
+    padding: 20px 24px 0;
+    text-align: center;
+  }
+  .plans-title { font-size: var(--text-xl); font-weight: 700; letter-spacing: -0.5px; }
+  .plans-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  .plan-toggle {
+    display: flex;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 4px;
+    margin: 20px 24px;
+    gap: 4px;
+  }
+  .plan-toggle-btn {
+    flex:1; padding: 8px; border-radius: 9px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    border: none; background: none;
+    color: var(--muted); font-family: inherit;
+  }
+  .plan-toggle-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(108,99,255,0.4);
+  }
+
+  .plan-cards { padding: 0 var(--space-md); display: flex; flex-direction: column; gap: 14px; }
+
+  .plan-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .plan-card:hover { border-color: rgba(108,99,255,0.4); transform: translateY(-2px); }
+  .plan-card.popular {
+    border-color: var(--accent);
+    background: linear-gradient(145deg, rgba(108,99,255,0.08), var(--card));
+  }
+  .popular-tag {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .plan-name { font-size: 16px; font-weight: 700; }
+  .plan-price-row { display: flex; align-items: baseline; gap: 4px; margin: 10px 0; }
+  .plan-price { font-size: var(--text-xl); font-weight: 700; letter-spacing: -1px; }
+  .plan-period { font-size: 13px; color: var(--muted); }
+  .plan-features { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .plan-feature {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .plan-feature-check {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: rgba(0,229,160,0.1);
+    color: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .plan-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 16px;
+    letter-spacing: 0.3px;
+  }
+  .plan-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.35);
+  }
+  .plan-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(108,99,255,0.5); }
+  .plan-btn.outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+
+  /* ── PROFILE SCREEN ── */
+  .profile-header {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .profile-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700;
+    box-shadow: 0 0 0 4px rgba(108,99,255,0.15);
+  }
+  .profile-name { font-size: var(--text-lg); font-weight: 700; }
+  .profile-email { font-size: 13px; color: var(--muted); }
+  .profile-plan-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  .profile-section { padding: 0 var(--space-md) 12px; }
+  .profile-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .profile-items { display: flex; flex-direction: column; gap: 2px; }
+  .profile-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .profile-item:last-child { border-bottom: none; }
+  .profile-item:hover { padding-right: 4px; }
+  .profile-item-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .profile-item-label { flex:1; font-size: 14px; font-weight: 500; }
+  .profile-item-value { font-size: 13px; color: var(--muted); }
+  .profile-item-arrow { color: var(--muted); font-size: 12px; }
+
+  /* subscription card */
+  .sub-card {
+    margin: 0 var(--space-md) 20px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sub-card::before {
+    content:'';
+    position:absolute;
+    top:-30px; right:-30px;
+    width:120px; height:120px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .sub-card-title { font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 4px; }
+  .sub-card-plan { font-size: var(--text-lg); font-weight: 800; letter-spacing: -0.5px; }
+  .sub-card-exp { font-size: 12px; opacity: 0.75; margin-top: 6px; }
+  .sub-card-progress {
+    margin-top: 14px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .sub-card-progress-fill {
+    height: 100%;
+    width: 62%;
+    background: rgba(255,255,255,0.7);
+    border-radius: 2px;
+  }
+  .sub-card-days { font-size: 11px; opacity: 0.7; margin-top: 6px; }
+
+  /* ── AMBIENT BG ── */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .ambient-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.04;
+  }
+  :root.light .ambient-blob { opacity: 0.08; }
+  :root.light .ab1 { background: var(--accent); }
+  :root.light .ab2 { background: var(--accent2); }
+  .ab1 { width:300px; height:300px; top:-50px; right:-80px; background: var(--accent); }
+  .ab2 { width:200px; height:200px; bottom:100px; left:-60px; background: var(--accent2); }
+
+  /* ── MISC ── */
+  .spacer { height: 16px; }
+
+  /* ── ANIMATION CLASSES ── */
+  @keyframes fade-up {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .fade-up { animation: fade-up 0.4s cubic-bezier(.4,0,.2,1) both; }
+  .delay-1 { animation-delay: 0.05s; }
+  .delay-2 { animation-delay: 0.10s; }
+  .delay-3 { animation-delay: 0.15s; }
+  .delay-4 { animation-delay: 0.20s; }
+  .delay-5 { animation-delay: 0.25s; }
+
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  /* Speed bars animation */
+  .speed-bar {
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .speed-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0;
+    transition: width 1.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* Loading dots */
+  .loading-dots span {
+    display: inline-block;
+    animation: dot-bounce 1.2s ease-in-out infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot-bounce {
+    0%,80%,100% { transform:translateY(0); }
+    40% { transform:translateY(-4px); }
+  }
+
+
+  /* ── LANGUAGE MODAL ── */
+  .lang-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .lang-modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .lang-modal {
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    padding: 12px 0 32px;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  }
+  .lang-modal-overlay.open .lang-modal {
+    transform: translateY(0);
+  }
+  .lang-modal-handle {
+    width: 36px; height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin: 0 auto 20px;
+  }
+  .lang-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    padding: 0 24px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .lang-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .lang-option:hover { background: rgba(108,99,255,0.05); }
+  .lang-option.active { background: rgba(108,99,255,0.08); }
+  .lang-option-flag {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .lang-option-info { flex: 1; }
+  .lang-option-name { font-size: 14px; font-weight: 600; }
+  .lang-option-native { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .lang-option-check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: scale(0.6);
+  }
+  .lang-option.active .lang-option-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .lang-option-check svg { width: 10px; height: 10px; color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="ambient">
+  <div class="ambient-blob ab1"></div>
+  <div class="ambient-blob ab2"></div>
+</div>
+
+<div class="phone-shell">
+
+  <!-- ════════════ HOME ════════════ -->
+  <div class="screen active" id="screen-home">
+    <div class="screen-content">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.56 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="1" y="6" width="4" height="12" rx="1"/><rect x="7" y="4" width="4" height="14" rx="1"/><rect x="13" y="2" width="4" height="16" rx="1"/><rect x="19" y="0" width="4" height="18" rx="1" opacity="0.3"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg>
+      </div>
+    </div>
+
+    <div class="home-header fade-up">
+      <div class="logo">MetRix VPN</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Change Theme">
+          <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+        <div class="avatar" onclick="navigate('profile')">M</div>
+      </div>
+    </div>
+
+    <div class="orb-section">
+      <div class="orb-ring fade-up delay-1">
+        <!-- SVG ring tracks -->
+        <svg class="ring-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6C63FF"/>
+              <stop offset="100%" stop-color="#00D4FF"/>
+            </linearGradient>
+            <linearGradient id="ringGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6C63FF" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#00D4FF" stop-opacity="0.25"/>
+            </linearGradient>
+          </defs>
+          <!-- outer faint ring -->
+          <circle class="ring-track" cx="100" cy="100" r="88"/>
+          <circle class="ring-fill2" id="ring-fill2" cx="100" cy="100" r="88"/>
+          <!-- main ring -->
+          <circle class="ring-track" cx="100" cy="100" r="80"/>
+          <circle class="ring-fill" id="ring-fill" cx="100" cy="100" r="80"/>
+        </svg>
+
+        <div class="ring-pulse" id="ring-pulse"></div>
+        <div class="orb-glow" id="orb-glow"></div>
+
+        <button class="orb-btn" id="orb-btn" onclick="toggleConnect()">
+          <div class="orb-icon" id="orb-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="orb-label" id="orb-label">CONNECT</div>
+        </button>
+      </div>
+
+      <div class="conn-status fade-up delay-2">
+        <div class="conn-status-label" id="conn-status-label">Disconnected</div>
+        <div class="conn-status-sub" id="conn-status-sub">Tap to connect</div>
+        <div class="conn-timer" id="conn-timer" style="display:none">00:00:00</div>
+      </div>
+    </div>
+
+    <div class="selected-server fade-up delay-3" onclick="navigate('servers')">
+      <div class="flag" id="selected-flag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+      </div>
+      <div class="server-info">
+        <div class="server-name" id="selected-server-name">Netherlands — Amsterdam</div>
+        <div class="server-ping"><div class="ping-dot"></div> 42 ms</div>
+      </div>
+      <div class="server-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <div class="stats-row fade-up delay-4">
+      <div class="stat-card">
+        <div class="stat-card-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          Upload
+        </div>
+        <div class="stat-card-value" id="stat-up">0.0 <span>MB/s</span></div>
+        <div class="speed-bar"><div class="speed-bar-fill" id="bar-up"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          Download
+        </div>
+        <div class="stat-card-value" id="stat-dn">0.0 <span>MB/s</span></div>
+        <div class="speed-bar"><div class="speed-bar-fill" id="bar-dn"></div></div>
+      </div>
+    </div>
+
+    </div><!-- /screen-content -->
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="navigate('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="nav-item" onclick="navigate('servers')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        Servers
+      </button>
+      <button class="nav-item" onclick="navigate('plans')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Plans
+      </button>
+      <button class="nav-item" onclick="navigate('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════ SERVERS ════════════ -->
+  <div class="screen" id="screen-servers">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><rect x="1" y="6" width="4" height="12" rx="1"/><rect x="7" y="4" width="4" height="14" rx="1"/><rect x="13" y="2" width="4" height="16" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="screen-title fade-up">Select Server</div>
+
+    <div class="search-bar fade-up delay-1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search servers...">
+    </div>
+
+    <div class="region-label fade-up delay-2">EUROPE</div>
+    <div class="server-list">
+      <div class="server-item selected fade-up delay-2" onclick="selectServer(this, 'Netherlands — Amsterdam', '42')">
+        <div class="server-flag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div class="server-details">
+          <div class="server-details-name">Netherlands — Amsterdam</div>
+          <div class="server-details-sub">Connected</div>
+        </div>
+        <span class="server-ping-badge">42 ms</span>
+      </div>
+      <div class="server-item fade-up delay-3" onclick="selectServer(this, 'Germany — Frankfurt', '58')">
+        <div class="server-flag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div class="server-details">
+          <div class="server-details-name">Germany — Frankfurt</div>
+          <div class="server-details-sub">High speed</div>
+        </div>
+        <span class="server-ping-badge">58 ms</span>
+      </div>
+      <div class="server-item fade-up delay-4" onclick="selectServer(this, 'United Kingdom — London', '91')">
+        <div class="server-flag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div class="server-details">
+          <div class="server-details-name">United Kingdom — London</div>
+          <div class="server-details-sub">Stable</div>
+        </div>
+        <span class="server-ping-badge medium">91 ms</span>
+      </div>
+    </div>
+
+    <div class="region-label fade-up delay-3" style="margin-top:8px">MIDDLE EAST</div>
+    <div class="server-list">
+      <div class="server-item fade-up delay-3" onclick="selectServer(this, 'Turkey — Istanbul', '28')">
+        <div class="server-flag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div class="server-details">
+          <div class="server-details-name">Turkey — Istanbul</div>
+          <div class="server-details-sub">Lowest ping</div>
+        </div>
+        <span class="server-ping-badge">28 ms</span>
+      </div>
+      <div class="server-item fade-up delay-4">
+        <div class="server-flag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="opacity:0.4"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div class="server-details">
+          <div class="server-details-name">UAE — Dubai</div>
+          <div class="server-details-sub">Coming soon</div>
+        </div>
+        <span class="pro-badge">PRO</span>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navigate('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="nav-item active" onclick="navigate('servers')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        Servers
+      </button>
+      <button class="nav-item" onclick="navigate('plans')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Plans
+      </button>
+      <button class="nav-item" onclick="navigate('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════ PLANS ════════════ -->
+  <div class="screen" id="screen-plans">
+    <div class="status-bar"><span>9:41</span></div>
+
+    <div class="plans-header fade-up">
+      <div class="plans-title">Subscription</div>
+      <div class="plans-sub">Buy once, access all servers</div>
+    </div>
+
+    <div class="plan-toggle fade-up delay-1">
+      <button class="plan-toggle-btn active" onclick="setPeriod('monthly', this)">Monthly</button>
+      <button class="plan-toggle-btn" onclick="setPeriod('quarterly', this)">3 Months</button>
+      <button class="plan-toggle-btn" onclick="setPeriod('yearly', this)">Yearly</button>
+    </div>
+
+    <div class="plan-cards">
+      <div class="plan-card fade-up delay-2">
+        <div class="plan-name">Free</div>
+        <div class="plan-price-row">
+          <div class="plan-price">$0</div>
+          <div class="plan-period">forever</div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> 1 Server (Netherlands)</div>
+          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> 1 GB per day</div>
+          <div class="plan-feature" style="opacity:0.4"><div class="plan-feature-check" style="background:rgba(255,75,110,0.1);color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3" width="9" height="9"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div> Premium servers</div>
+        </div>
+        <button class="plan-btn outline">Continue Free</button>
+      </div>
+
+      <div class="plan-card popular fade-up delay-3">
+        <div class="popular-tag">Most Popular</div>
+        <div class="plan-name" style="margin-top:8px">Pro</div>
+        <div class="plan-price-row">
+          <div class="plan-price" id="plan-price">$4.99</div>
+          <div class="plan-period" id="plan-period">/ mo</div>
+        </div>
+        <div class="plan-features">
+          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> All servers unlimited</div>
+          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> Full speed</div>
+          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> 24/7 Support</div>
+          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> Up to 3 devices</div>
+        </div>
+        <button class="plan-btn primary">Get Pro</button>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navigate('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="nav-item" onclick="navigate('servers')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
+        Servers
+      </button>
+      <button class="nav-item active" onclick="navigate('plans')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Plans
+      </button>
+      <button class="nav-item" onclick="navigate('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════ PROFILE ════════════ -->
+  <div class="screen" id="screen-profile">
+    <div class="status-bar"><span>9:41</span></div>
+
+    <div class="profile-header fade-up">
+      <div class="profile-avatar">M</div>
+      <div class="profile-name">Michael</div>
+      <div class="profile-email">michael@metrix.vpn</div>
+      <div class="profile-plan-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12" style="margin-left:4px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Pro
+      </div>
+    </div>
+
+    <div class="sub-card fade-up delay-1">
+      <div class="sub-card-title">Active Subscription</div>
+      <div class="sub-card-plan">Pro — 3 Months</div>
+      <div class="sub-card-exp">Expires: Sep 6, 2025</div>
+      <div class="sub-card-progress"><div class="sub-card-progress-fill"></div></div>
+      <div class="sub-card-days">62 days remaining</div>
+    </div>
+
+    <div class="profile-section fade-up delay-2">
+      <div class="profile-section-title">ACCOUNT</div>
+      <div class="profile-items">
+        <div class="profile-item">
+          <div class="profile-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="profile-item-label">This Month Usage</div>
+          <div class="profile-item-value">47.3 GB</div>
+          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="profile-item">
+          <div class="profile-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div class="profile-item-label">Change Password</div>
+          <div class="profile-item-value"></div>
+          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="profile-item">
+          <div class="profile-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div class="profile-item-label">Connected Devices</div>
+          <div class="profile-item-value">2 of 3</div>
+          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-section fade-up delay-3">
+      <div class="profile-section-title">SETTINGS</div>
+      <div class="profile-items">
+        <div class="profile-item" onclick="openLangModal()">
+          <div class="profile-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>
+          </div>
+          <div class="profile-item-label" data-i18n="language">Language</div>
+          <div class="profile-item-value" id="current-lang-label">English</div>
+          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="profile-item">
+          <div class="profile-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </div>
+          <div class="profile-item-label" data-i18n="protocol">Protocol</div>
+          <div class="profile-item-value">VLESS</div>
+          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="profile-item">
+          <div class="profile-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          </div>
+          <div class="profile-item-label">Notifications</div>
+          <div class="profile-item-value">Enabled</div>
+          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="profile-item" style="color:var(--red)">
+          <div class="profile-item-icon" style="background:rgba(255,75,110,0.08)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" width="18" height="18"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </div>
+          <div class="profile-item-label" style="color:var(--red)">Sign Out</div>
+          <div class="profile-item-value"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navigate('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="nav-item" onclick="navigate('servers')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
+        Servers
+      </button>
+      <button class="nav-item" onclick="navigate('plans')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Plans
+      </button>
+      <button class="nav-item active" onclick="navigate('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ════════════ LANGUAGE MODAL ════════════ -->
+  <div class="lang-modal-overlay" id="lang-modal" onclick="closeLangModal(event)">
+    <div class="lang-modal">
+      <div class="lang-modal-handle"></div>
+      <div class="lang-modal-title" data-i18n="selectLang">Select Language</div>
+      <div class="lang-option active" id="lang-en" onclick="setLang('en')">
+        <div class="lang-option-flag">🇺🇸</div>
+        <div class="lang-option-info">
+          <div class="lang-option-name">English</div>
+          <div class="lang-option-native">English</div>
+        </div>
+        <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="lang-option" id="lang-fa" onclick="setLang('fa')">
+        <div class="lang-option-flag">🇮🇷</div>
+        <div class="lang-option-info">
+          <div class="lang-option-name">Persian</div>
+          <div class="lang-option-native">فارسی</div>
+        </div>
+        <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="lang-option" id="lang-ar" onclick="setLang('ar')">
+        <div class="lang-option-flag">🇸🇦</div>
+        <div class="lang-option-info">
+          <div class="lang-option-name">Arabic</div>
+          <div class="lang-option-native">العربية</div>
+        </div>
+        <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="lang-option" id="lang-ru" onclick="setLang('ru')">
+        <div class="lang-option-flag">🇷🇺</div>
+        <div class="lang-option-info">
+          <div class="lang-option-name">Russian</div>
+          <div class="lang-option-native">Русский</div>
+        </div>
+        <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="lang-option" id="lang-tr" onclick="setLang('tr')">
+        <div class="lang-option-flag">🇹🇷</div>
+        <div class="lang-option-info">
+          <div class="lang-option-name">Turkish</div>
+          <div class="lang-option-native">Türkçe</div>
+        </div>
+        <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="lang-option" id="lang-zh" onclick="setLang('zh')">
+        <div class="lang-option-flag">🇨🇳</div>
+        <div class="lang-option-info">
+          <div class="lang-option-name">Chinese</div>
+          <div class="lang-option-native">中文</div>
+        </div>
+        <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /phone-shell -->
+
+<script>
+// ── Navigation ──
+function navigate(page) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.transform = 'translateX(30px)';
+  });
+  const target = document.getElementById('screen-' + page);
+  if (target) {
+    target.style.transform = 'translateX(30px)';
+    requestAnimationFrame(() => {
+      target.classList.add('active');
+      target.style.transform = '';
+      target.scrollTop = 0;
+    });
+  }
+  // re-trigger fade-up
+  document.querySelectorAll('#screen-' + page + ' .fade-up').forEach((el, i) => {
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+  });
+}
+
+// ── Connect Toggle ──
+let connected = false;
+let connecting = false;
+let timer = null;
+let seconds = 0;
+let statsTimer = null;
+
+const SVG_SHIELD = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="40" height="40"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+
+function ringFill(on) {
+  const r1 = document.getElementById('ring-fill');
+  const r2 = document.getElementById('ring-fill2');
+  if (on) {
+    r1.style.strokeDashoffset = '0';
+    r2.style.strokeDashoffset = '0';
+  } else {
+    r1.style.strokeDashoffset = '502';
+    r2.style.strokeDashoffset = '553';
+  }
+}
+
+function ringConnecting(on) {
+  const r1 = document.getElementById('ring-fill');
+  if (on) {
+    r1.style.transition = 'none';
+    r1.classList.add('spin');
+  } else {
+    r1.classList.remove('spin');
+    r1.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1)';
+  }
+}
+
+function toggleConnect() {
+  if (connecting) return;
+  const t = translations[currentLang];
+  const btn = document.getElementById('orb-btn');
+  const icon = document.getElementById('orb-icon');
+  const label = document.getElementById('orb-label');
+  const statusLabel = document.getElementById('conn-status-label');
+  const statusSub = document.getElementById('conn-status-sub');
+  const connTimer = document.getElementById('conn-timer');
+  const glow = document.getElementById('orb-glow');
+  const pulse = document.getElementById('ring-pulse');
+
+  if (!connected) {
+    connecting = true;
+    ringConnecting(true);
+    label.textContent = t ? t.connecting : 'Connecting...';
+    statusLabel.innerHTML = (t ? t.connecting : 'Connecting') + ' <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>';
+    statusSub.textContent = document.getElementById('selected-server-name').textContent;
+
+    setTimeout(() => {
+      connecting = false;
+      connected = true;
+      ringConnecting(false);
+      ringFill(true);
+      btn.classList.add('connected');
+      icon.innerHTML = SVG_SHIELD;
+      label.textContent = t ? t.connected : 'CONNECTED';
+      statusLabel.textContent = t ? t.protected : 'Protected';
+      statusLabel.style.color = 'var(--green)';
+      statusSub.textContent = document.getElementById('selected-server-name').textContent;
+      connTimer.style.display = 'block';
+      glow.classList.add('green');
+      pulse.classList.add('active');
+
+      seconds = 0;
+      timer = setInterval(() => {
+        seconds++;
+        connTimer.textContent = formatTime(seconds);
+      }, 1000);
+
+      setTimeout(() => {
+        document.getElementById('bar-up').style.width = '55%';
+        document.getElementById('bar-dn').style.width = '78%';
+        startStatsAnimation();
+      }, 300);
+    }, 2200);
+
+  } else {
+    connected = false;
+    btn.classList.remove('connected');
+    ringFill(false);
+    icon.innerHTML = SVG_SHIELD;
+    label.textContent = t ? t.connect : 'CONNECT';
+    statusLabel.textContent = t ? t.disconnected : 'Disconnected';
+    statusLabel.style.color = '';
+    statusSub.textContent = t ? t.tapToConnect : 'Tap to connect';
+    connTimer.style.display = 'none';
+    glow.classList.remove('green');
+    pulse.classList.remove('active');
+
+    clearInterval(timer);
+    clearInterval(statsTimer);
+    document.getElementById('stat-up').innerHTML = '0.0 <span>MB/s</span>';
+    document.getElementById('stat-dn').innerHTML = '0.0 <span>MB/s</span>';
+    document.getElementById('bar-up').style.width = '0';
+    document.getElementById('bar-dn').style.width = '0';
+  }
+}
+
+function formatTime(s) {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return [h, m, sec].map(v => String(v).padStart(2, '0')).join(':');
+}
+
+function startStatsAnimation() {
+  statsTimer = setInterval(() => {
+    if (!connected) return;
+    const up = (Math.random() * 2 + 0.3).toFixed(1);
+    const dn = (Math.random() * 5 + 1).toFixed(1);
+    document.getElementById('stat-up').innerHTML = `${up} <span>MB/s</span>`;
+    document.getElementById('stat-dn').innerHTML = `${dn} <span>MB/s</span>`;
+    document.getElementById('bar-up').style.width = `${Math.min(up / 3 * 100, 95)}%`;
+    document.getElementById('bar-dn').style.width = `${Math.min(dn / 7 * 100, 95)}%`;
+  }, 1500);
+}
+
+// ── Server Select ──
+function selectServer(el, name, ping) {
+  document.querySelectorAll('.server-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('.server-details-sub').textContent = translations[currentLang] ? translations[currentLang].selected : 'Selected';
+  document.getElementById('selected-server-name').textContent = name;
+  setTimeout(() => navigate('home'), 300);
+}
+
+// ── Theme Toggle ──
+const SUN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+const MOON_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`;
+
+let isLight = false;
+function toggleTheme() {
+  isLight = !isLight;
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle-btn');
+  const icon = document.getElementById('theme-icon');
+  if (isLight) {
+    root.classList.add('light');
+    icon.innerHTML = SUN_ICON.match(/<svg[^>]*>(.*)<\/svg>/s)[1];
+    btn.classList.add('light-active');
+  } else {
+    root.classList.remove('light');
+    icon.innerHTML = MOON_ICON.match(/<svg[^>]*>(.*)<\/svg>/s)[1];
+    btn.classList.remove('light-active');
+  }
+}
+
+// ── Plan Toggle ──
+const prices = { monthly: ['$4.99', '/ mo'], quarterly: ['$3.99', '/ mo'], yearly: ['$2.99', '/ mo'] };
+function setPeriod(period, btn) {
+  document.querySelectorAll('.plan-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('plan-price').textContent = prices[period][0];
+  document.getElementById('plan-period').textContent = prices[period][1];
+}
+
+// ── i18n Translations ──
+const translations = {
+  en: {
+    dir: 'ltr', lang: 'en',
+    home: 'Home', servers: 'Servers', plans: 'Plans', profile: 'Profile',
+    connect: 'CONNECT', connected: 'CONNECTED', connecting: 'Connecting...',
+    disconnected: 'Disconnected', protected: 'Protected',
+    tapToConnect: 'Tap to connect',
+    selectServer: 'Select Server', searchServer: 'Search servers...',
+    europe: 'EUROPE', middleEast: 'MIDDLE EAST',
+    netherlands: 'Netherlands — Amsterdam', germany: 'Germany — Frankfurt',
+    uk: 'United Kingdom — London', turkey: 'Turkey — Istanbul', uae: 'UAE — Dubai',
+    comingSoon: 'Coming soon', highSpeed: 'High speed', stable: 'Stable',
+    lowestPing: 'Lowest ping', selected: 'Selected', connected2: 'Connected',
+    subscription: 'Subscription', monthly: 'Monthly', quarterly: '3 Months', yearly: 'Yearly',
+    perMonth: '/ mo', free: 'Free', pro: 'Pro',
+    mostPopular: 'Most Popular',
+    oneServer: '1 Server (Netherlands)', onegbDay: '1 GB per day', premiumServers: 'Premium servers',
+    unlimitedServers: 'All servers unlimited', fullSpeed: 'Full speed',
+    support247: '24/7 Support', devices3: 'Up to 3 devices',
+    continueFree: 'Continue Free', buyPro: 'Get Pro',
+    upload: 'Upload', download: 'Download',
+    account: 'ACCOUNT', settings: 'SETTINGS',
+    usage: 'This Month Usage', changePass: 'Change Password',
+    devicesConnected: 'Connected Devices', of: 'of',
+    language: 'Language', protocol: 'Protocol', notifications: 'Notifications',
+    enabled: 'Enabled', logout: 'Sign Out',
+    activeSubscription: 'Active Subscription', expires: 'Expires',
+    daysLeft: 'days remaining', selectLang: 'Select Language',
+    michael: 'Michael',
+  },
+  fa: {
+    dir: 'rtl', lang: 'fa',
+    home: 'خانه', servers: 'سرورها', plans: 'پلن‌ها', profile: 'پروفایل',
+    connect: 'اتصال', connected: 'متصل', connecting: 'در حال اتصال...',
+    disconnected: 'قطع شده', protected: 'محافظت شده',
+    tapToConnect: 'برای اتصال لمس کنید',
+    selectServer: 'انتخاب سرور', searchServer: 'جستجوی سرور...',
+    europe: 'اروپا', middleEast: 'خاورمیانه',
+    netherlands: 'هلند — آمستردام', germany: 'آلمان — فرانکفورت',
+    uk: 'انگلستان — لندن', turkey: 'ترکیه — استانبول', uae: 'امارات — دبی',
+    comingSoon: 'به‌زودی', highSpeed: 'سرعت بالا', stable: 'پایدار',
+    lowestPing: 'کمترین پینگ', selected: 'انتخاب شده', connected2: 'متصل شده',
+    subscription: 'اشتراک', monthly: 'ماهانه', quarterly: '۳ ماهه', yearly: 'سالانه',
+    perMonth: '/ ماه', free: 'رایگان', pro: 'پرو',
+    mostPopular: 'محبوب‌ترین',
+    oneServer: '1 Server (Netherlands)', onegbDay: '1 GB per day', premiumServers: 'Premium servers',
+    unlimitedServers: 'All servers unlimited', fullSpeed: 'Full speed',
+    support247: '24/7 Support', devices3: 'Up to 3 devices',
+    continueFree: 'ادامه با رایگان', buyPro: 'خرید پرو',
+    upload: 'آپلود', download: 'دانلود',
+    account: 'اکانت', settings: 'تنظیمات',
+    usage: 'مصرف این ماه', changePass: 'تغییر رمز',
+    devicesConnected: 'دستگاه‌های متصل', of: 'از',
+    language: 'زبان', protocol: 'پروتکل', notifications: 'اعلان‌ها',
+    enabled: 'فعال', logout: 'خروج از اکانت',
+    activeSubscription: 'اشتراک فعال', expires: 'انقضا',
+    daysLeft: 'روز باقی‌مانده', selectLang: 'انتخاب زبان',
+    michael: 'مایکل',
+  },
+  ar: {
+    dir: 'rtl', lang: 'ar',
+    home: 'الرئيسية', servers: 'الخوادم', plans: 'الخطط', profile: 'الملف',
+    connect: 'اتصال', connected: 'متصل', connecting: 'جاري الاتصال...',
+    disconnected: 'غير متصل', protected: 'محمي',
+    tapToConnect: 'انقر للاتصال',
+    selectServer: 'اختر خادم', searchServer: 'البحث...',
+    europe: 'أوروبا', middleEast: 'الشرق الأوسط',
+    netherlands: 'هولندا — أمستردام', germany: 'ألمانيا — فرانكفورت',
+    uk: 'المملكة المتحدة — لندن', turkey: 'تركيا — إسطنبول', uae: 'الإمارات — دبي',
+    comingSoon: 'قريباً', highSpeed: 'سرعة عالية', stable: 'مستقر',
+    lowestPing: 'أقل تأخير', selected: 'محدد', connected2: 'متصل',
+    subscription: 'الاشتراك', monthly: 'شهري', quarterly: '٣ أشهر', yearly: 'سنوي',
+    perMonth: '/ شهر', free: 'مجاني', pro: 'برو',
+    mostPopular: 'الأكثر شعبية',
+    oneServer: 'خادم واحد', onegbDay: '١ جيجا يومياً', premiumServers: 'خوادم مميزة',
+    unlimitedServers: 'جميع الخوادم', fullSpeed: 'سرعة كاملة',
+    support247: 'دعم ٢٤/٧', devices3: 'حتى ٣ أجهزة',
+    continueFree: 'استمرار مجاني', buyPro: 'شراء برو',
+    upload: 'رفع', download: 'تنزيل',
+    account: 'الحساب', settings: 'الإعدادات',
+    usage: 'الاستخدام هذا الشهر', changePass: 'تغيير كلمة المرور',
+    devicesConnected: 'الأجهزة المتصلة', of: 'من',
+    language: 'اللغة', protocol: 'البروتوكول', notifications: 'الإشعارات',
+    enabled: 'مفعل', logout: 'تسجيل الخروج',
+    activeSubscription: 'الاشتراك الفعال', expires: 'تنتهي',
+    daysLeft: 'يوم متبقي', selectLang: 'اختر اللغة',
+    michael: 'مايكل',
+  },
+  ru: {
+    dir: 'ltr', lang: 'ru',
+    home: 'Главная', servers: 'Серверы', plans: 'Тарифы', profile: 'Профиль',
+    connect: 'ПОДКЛЮЧИТЬ', connected: 'ПОДКЛЮЧЕНО', connecting: 'Подключение...',
+    disconnected: 'Отключено', protected: 'Защищено',
+    tapToConnect: 'Нажмите для подключения',
+    selectServer: 'Выбор сервера', searchServer: 'Поиск серверов...',
+    europe: 'ЕВРОПА', middleEast: 'БЛИЖНИЙ ВОСТОК',
+    netherlands: 'Нидерланды — Амстердам', germany: 'Германия — Франкфурт',
+    uk: 'Великобритания — Лондон', turkey: 'Турция — Стамбул', uae: 'ОАЭ — Дубай',
+    comingSoon: 'Скоро', highSpeed: 'Высокая скорость', stable: 'Стабильный',
+    lowestPing: 'Минимальный пинг', selected: 'Выбрано', connected2: 'Подключено',
+    subscription: 'Подписка', monthly: 'Месяц', quarterly: '3 Месяца', yearly: 'Год',
+    perMonth: '/ мес', free: 'Бесплатно', pro: 'Про',
+    mostPopular: 'Популярное',
+    oneServer: '1 Сервер', onegbDay: '1 ГБ в день', premiumServers: 'Премиум серверы',
+    unlimitedServers: 'Все серверы', fullSpeed: 'Полная скорость',
+    support247: 'Поддержка 24/7', devices3: 'До 3 устройств',
+    continueFree: 'Продолжить бесплатно', buyPro: 'Купить Про',
+    upload: 'Загрузка', download: 'Скачивание',
+    account: 'АККАУНТ', settings: 'НАСТРОЙКИ',
+    usage: 'Использование', changePass: 'Сменить пароль',
+    devicesConnected: 'Подключённые устройства', of: 'из',
+    language: 'Язык', protocol: 'Протокол', notifications: 'Уведомления',
+    enabled: 'Включено', logout: 'Выйти',
+    activeSubscription: 'Активная подписка', expires: 'Истекает',
+    daysLeft: 'дней осталось', selectLang: 'Выбор языка',
+    michael: 'Михаил',
+  },
+  tr: {
+    dir: 'ltr', lang: 'tr',
+    home: 'Ana Sayfa', servers: 'Sunucular', plans: 'Planlar', profile: 'Profil',
+    connect: 'BAĞLAN', connected: 'BAĞLANDI', connecting: 'Bağlanıyor...',
+    disconnected: 'Bağlantı Kesildi', protected: 'Korunuyor',
+    tapToConnect: 'Bağlanmak için dokun',
+    selectServer: 'Sunucu Seç', searchServer: 'Sunucu ara...',
+    europe: 'AVRUPA', middleEast: 'ORTA DOĞU',
+    netherlands: 'Hollanda — Amsterdam', germany: 'Almanya — Frankfurt',
+    uk: 'İngiltere — Londra', turkey: 'Türkiye — İstanbul', uae: 'BAE — Dubai',
+    comingSoon: 'Yakında', highSpeed: 'Yüksek hız', stable: 'Kararlı',
+    lowestPing: 'En düşük ping', selected: 'Seçildi', connected2: 'Bağlandı',
+    subscription: 'Abonelik', monthly: 'Aylık', quarterly: '3 Aylık', yearly: 'Yıllık',
+    perMonth: '/ ay', free: 'Ücretsiz', pro: 'Pro',
+    mostPopular: 'En Popüler',
+    oneServer: '1 Sunucu', onegbDay: 'Günlük 1 GB', premiumServers: 'Premium sunucular',
+    unlimitedServers: 'Tüm sunucular', fullSpeed: 'Tam hız',
+    support247: '7/24 Destek', devices3: '3 cihaza kadar',
+    continueFree: 'Ücretsiz devam et', buyPro: 'Pro Satın Al',
+    upload: 'Yükleme', download: 'İndirme',
+    account: 'HESAP', settings: 'AYARLAR',
+    usage: 'Bu Ay Kullanım', changePass: 'Şifre Değiştir',
+    devicesConnected: 'Bağlı Cihazlar', of: '/',
+    language: 'Dil', protocol: 'Protokol', notifications: 'Bildirimler',
+    enabled: 'Açık', logout: 'Çıkış Yap',
+    activeSubscription: 'Aktif Abonelik', expires: 'Bitiş',
+    daysLeft: 'gün kaldı', selectLang: 'Dil Seç',
+    michael: 'Michael',
+  },
+  zh: {
+    dir: 'ltr', lang: 'zh',
+    home: '首页', servers: '服务器', plans: '套餐', profile: '我的',
+    connect: '连接', connected: '已连接', connecting: '连接中...',
+    disconnected: '已断开', protected: '已保护',
+    tapToConnect: '点击连接',
+    selectServer: '选择服务器', searchServer: '搜索服务器...',
+    europe: '欧洲', middleEast: '中东',
+    netherlands: '荷兰 — 阿姆斯特丹', germany: '德国 — 法兰克福',
+    uk: '英国 — 伦敦', turkey: '土耳其 — 伊斯坦布尔', uae: '阿联酋 — 迪拜',
+    comingSoon: '即将推出', highSpeed: '高速', stable: '稳定',
+    lowestPing: '最低延迟', selected: '已选择', connected2: '已连接',
+    subscription: '订阅', monthly: '月付', quarterly: '季付', yearly: '年付',
+    perMonth: '/月', free: '免费', pro: '专业版',
+    mostPopular: '最受欢迎',
+    oneServer: '1个服务器', onegbDay: '每天1GB', premiumServers: '高级服务器',
+    unlimitedServers: '所有服务器', fullSpeed: '全速',
+    support247: '24/7支持', devices3: '最多3台设备',
+    continueFree: '免费继续', buyPro: '购买专业版',
+    upload: '上传', download: '下载',
+    account: '账户', settings: '设置',
+    usage: '本月用量', changePass: '修改密码',
+    devicesConnected: '已连接设备', of: '/',
+    language: '语言', protocol: '协议', notifications: '通知',
+    enabled: '已开启', logout: '退出登录',
+    activeSubscription: '当前订阅', expires: '到期',
+    daysLeft: '天剩余', selectLang: '选择语言',
+    michael: 'Michael',
+  }
+};
+
+const langNames = { en:'English', fa:'فارسی', ar:'العربية', ru:'Русский', tr:'Türkçe', zh:'中文' };
+let currentLang = 'en';
+
+function applyLang(code) {
+  const t = translations[code];
+  const html = document.documentElement;
+  html.lang = t.lang;
+  html.dir = t.dir;
+
+  // nav labels
+  const navLabels = document.querySelectorAll('.nav-item');
+  const navKeys = ['home','servers','plans','profile'];
+  navLabels.forEach((el, i) => {
+    const txt = el.lastChild;
+    if (txt && navKeys[i]) txt.textContent = t[navKeys[i]];
+  });
+
+  // orb label
+  const orbLabel = document.getElementById('orb-label');
+  if (orbLabel) orbLabel.textContent = connected ? t.connected : t.connect;
+
+  // status
+  const sl = document.getElementById('conn-status-label');
+  const ss = document.getElementById('conn-status-sub');
+  if (sl) sl.textContent = connected ? t.protected : t.disconnected;
+  if (ss && !connected) ss.textContent = t.tapToConnect;
+
+  // server name
+  const sn = document.getElementById('selected-server-name');
+  if (sn) sn.textContent = t.netherlands;
+
+  // stat labels
+  const statLabels = document.querySelectorAll('.stat-card-label');
+  if (statLabels[0]) statLabels[0].lastChild.textContent = ' ' + t.upload;
+  if (statLabels[1]) statLabels[1].lastChild.textContent = ' ' + t.download;
+
+  // screens title
+  const screenTitle = document.querySelector('.screen-title');
+  if (screenTitle) screenTitle.textContent = t.selectServer;
+
+  // search placeholder
+  const searchInput = document.querySelector('.search-bar input');
+  if (searchInput) searchInput.placeholder = t.searchServer;
+
+  // region labels
+  const regionLabels = document.querySelectorAll('.region-label');
+  if (regionLabels[0]) regionLabels[0].textContent = t.europe;
+  if (regionLabels[1]) regionLabels[1].textContent = t.middleEast;
+
+  // server names
+  const serverNames = document.querySelectorAll('.server-details-name');
+  const serverKeys = ['netherlands','germany','uk','turkey','uae'];
+  serverNames.forEach((el, i) => { if (serverKeys[i]) el.textContent = t[serverKeys[i]]; });
+
+  // plan toggle buttons
+  const planBtns = document.querySelectorAll('.plan-toggle-btn');
+  if (planBtns[0]) planBtns[0].textContent = t.monthly;
+  if (planBtns[1]) planBtns[1].textContent = t.quarterly;
+  if (planBtns[2]) planBtns[2].textContent = t.yearly;
+
+  // plan period
+  const pp = document.getElementById('plan-period');
+  if (pp) pp.textContent = t.perMonth;
+
+  // popular tag
+  const popTag = document.querySelector('.popular-tag');
+  if (popTag) popTag.textContent = t.mostPopular;
+
+  // plan names
+  const planNames = document.querySelectorAll('.plan-name');
+  if (planNames[0]) planNames[0].textContent = t.free;
+  if (planNames[1]) planNames[1].textContent = t.pro;
+
+  // plan features
+  const features = document.querySelectorAll('.plan-feature');
+  const featureKeys = ['oneServer','onegbDay','premiumServers','unlimitedServers','fullSpeed','support247','devices3'];
+  features.forEach((el, i) => {
+    if (featureKeys[i]) {
+      const check = el.querySelector('.plan-feature-check');
+      el.textContent = ' ' + t[featureKeys[i]];
+      if (check) el.insertBefore(check, el.firstChild);
+    }
+  });
+
+  // plan buttons
+  const planBtnPrimary = document.querySelector('.plan-btn.primary');
+  const planBtnOutline = document.querySelector('.plan-btn.outline');
+  if (planBtnPrimary) planBtnPrimary.textContent = t.buyPro;
+  if (planBtnOutline) planBtnOutline.textContent = t.continueFree;
+
+  // plans header
+  const plansTitle = document.querySelector('.plans-title');
+  if (plansTitle) plansTitle.textContent = t.subscription;
+
+  // profile name
+  const pname = document.querySelector('.profile-name');
+  if (pname) pname.textContent = t.michael;
+
+  // profile section titles
+  const secTitles = document.querySelectorAll('.profile-section-title');
+  if (secTitles[0]) secTitles[0].textContent = t.account;
+  if (secTitles[1]) secTitles[1].textContent = t.settings;
+
+  // profile item labels
+  const itemLabels = document.querySelectorAll('.profile-item-label');
+  const itemKeys = ['usage','changePass','devicesConnected','language','protocol','notifications','logout'];
+  itemLabels.forEach((el, i) => { if (itemKeys[i]) el.textContent = t[itemKeys[i]]; });
+
+  // notifications value
+  const itemVals = document.querySelectorAll('.profile-item-value');
+  if (itemVals[3]) itemVals[3].textContent = langNames[code];
+  if (itemVals[5]) itemVals[5].textContent = t.enabled;
+
+  // current lang label in settings
+  const cll = document.getElementById('current-lang-label');
+  if (cll) cll.textContent = langNames[code];
+
+  // sub card
+  const subTitle = document.querySelector('.sub-card-title');
+  if (subTitle) subTitle.textContent = t.activeSubscription;
+
+  // modal title
+  const modalTitle = document.querySelector('.lang-modal-title');
+  if (modalTitle) modalTitle.textContent = t.selectLang;
+
+  // prices
+  const priceMap = {
+    en: { monthly:['$4.99','/ mo'], quarterly:['$3.99','/ mo'], yearly:['$2.99','/ mo'] },
+    fa: { monthly:['۸۰,۰۰۰','/ ماه'], quarterly:['۶۵,۰۰۰','/ ماه'], yearly:['۴۵,۰۰۰','/ ماه'] },
+    ar: { monthly:['$4.99','/ شهر'], quarterly:['$3.99','/ شهر'], yearly:['$2.99','/ شهر'] },
+    ru: { monthly:['299₽','/ мес'], quarterly:['249₽','/ мес'], yearly:['199₽','/ мес'] },
+    tr: { monthly:['₺149','/ ay'], quarterly:['₺119','/ ay'], yearly:['₺89','/ ay'] },
+    zh: { monthly:['¥35','/ 月'], quarterly:['¥28','/ 月'], yearly:['¥22','/ 月'] },
+  };
+  window._prices = priceMap[code];
+  const activePeriod = document.querySelector('.plan-toggle-btn.active');
+  if (activePeriod) {
+    const periodMap = { [t.monthly]:'monthly', [t.quarterly]:'quarterly', [t.yearly]:'yearly' };
+    const pKey = Object.keys(periodMap)[['monthly','quarterly','yearly'].indexOf(
+      activePeriod === document.querySelectorAll('.plan-toggle-btn')[0] ? 'monthly' :
+      activePeriod === document.querySelectorAll('.plan-toggle-btn')[1] ? 'quarterly' : 'yearly'
+    )];
+    const pp2 = document.getElementById('plan-price');
+    const pp3 = document.getElementById('plan-period');
+    const entry = priceMap[code][pKey || 'monthly'];
+    if (pp2 && entry) pp2.textContent = entry[0];
+    if (pp3 && entry) pp3.textContent = entry[1];
+  }
+}
+
+function openLangModal() {
+  document.getElementById('lang-modal').classList.add('open');
+}
+function closeLangModal(e) {
+  if (e.target === document.getElementById('lang-modal')) {
+    document.getElementById('lang-modal').classList.remove('open');
+  }
+}
+function setLang(code) {
+  currentLang = code;
+  document.querySelectorAll('.lang-option').forEach(el => el.classList.remove('active'));
+  document.getElementById('lang-' + code).classList.add('active');
+  applyLang(code);
+  setTimeout(() => {
+    document.getElementById('lang-modal').classList.remove('open');
+  }, 280);
+}
+
+// init English on load
+applyLang('en');
+
+</script>
+
+  <!-- Capacitor Bridge -->
+  <script src="capacitor.js"></script>
+  <script>
+    window.addEventListener('load', async () => {
+      if (!window.Capacitor) return;
+
+      // Status bar dark
+      try {
+        const { StatusBar } = window.Capacitor.Plugins;
+        await StatusBar.setStyle({ style: 'DARK' });
+        await StatusBar.setBackgroundColor({ color: '#07080F' });
+      } catch(e) {}
+
+      // Hide splash screen
+      try {
+        const { SplashScreen } = window.Capacitor.Plugins;
+        setTimeout(() => SplashScreen.hide(), 300);
+      } catch(e) {}
+    });
+
+    // Android hardware back button
+    document.addEventListener('backbutton', () => {
+      const active = document.querySelector('.screen.active');
+      if (active && active.id !== 'screen-home') {
+        navigate('home');
+      } else {
+        try { window.Capacitor.Plugins.App.exitApp(); } catch(e) {}
+      }
+    }, false);
+  </script>
+</body>
+</html>
