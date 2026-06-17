@@ -2179,7 +2179,7 @@ function initMap() {
   if (!el || !el.offsetParent) return;
 
   _map = L.map('leaflet-map', {
-    center: [25, 18], zoom: 2,
+    center: [30, 20], zoom: 3,
     zoomControl: false, scrollWheelZoom: false,
     doubleClickZoom: false, touchZoom: false,
     dragging: false, attributionControl: false, keyboard: false,
@@ -2241,9 +2241,9 @@ function mapSetConnected(on) {
   if (_mapPinMarker) _mapPinMarker.setIcon(_makePinIcon(on));
 
   if (on) {
-    // Show arc after flyTo completes
     const ll = _mapPinMarker.getLatLng();
-    _map.flyTo([ll.lat - 2, ll.lng], 4, { duration: 1.6, easeLinearity: 0.35 });
+    // pan only — no zoom change, avoids tile reload
+    _map.panTo([ll.lat - 1, ll.lng], { animate: true, duration: 1.2, easeLinearity: 0.4 });
     _map.once('moveend', () => {
       if (!_mapConnected) return;
       _redrawArc();
@@ -2255,7 +2255,8 @@ function mapSetConnected(on) {
     _arcMain.style.opacity = '0';
     _arcShadow.style.opacity = '0';
     _arcMain.style.animation = 'none';
-    _map.flyTo([25, 18], 2, { duration: 1.2, easeLinearity: 0.4 });
+    // pan back — same zoom, no tile reload
+    _map.panTo([30, 20], { animate: true, duration: 1.0, easeLinearity: 0.4 });
   }
 
   const badge = document.getElementById('map-server-badge');
