@@ -185,39 +185,64 @@
 
   /* ── HOME SCREEN ── */
   .home-header {
-    padding: 16px 24px 0;
+    padding: clamp(12px,3vw,20px) 20px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .logo {
-    font-size: 18px;
-    font-weight: 900;
     font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
     letter-spacing: 2px;
     text-transform: uppercase;
-    font-size: clamp(15px, 4.5vw, 20px);
+    font-size: clamp(14px, 4vw, 19px);
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 12px rgba(108,99,255,0.35));
+    filter: drop-shadow(0 0 10px rgba(108,99,255,0.3));
   }
+  .header-right { display:flex; align-items:center; gap:8px; }
   .avatar {
-    width: 36px; height: 36px;
+    width: 34px; height: 34px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; color: #fff;
+    font-size: 13px; font-weight: 700; color: #fff;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(108,99,255,0.4);
   }
+
+  /* ── IP CHIP ── */
+  .ip-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 10px 20px 0;
+    width: fit-content;
+  }
+  .ip-chip svg { width:11px; height:11px; flex-shrink:0; }
+  .ip-chip .ip-val { color: var(--text); font-weight: 600; letter-spacing: 0.3px; }
+  .ip-chip .ip-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--muted);
+    transition: background 0.4s;
+  }
+  .ip-chip .ip-dot.secure { background: var(--green); }
 
   /* ── RING LOADER BUTTON ── */
   .orb-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 32px 24px 24px;
-    gap: 24px;
+    padding: clamp(16px,4vw,28px) 20px clamp(12px,3vw,20px);
+    gap: clamp(12px,3vw,20px);
   }
 
   .orb-ring {
@@ -352,18 +377,31 @@
   .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 0 24px 20px;
+    gap: 10px;
+    padding: 0 20px 16px;
   }
   .stat-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 14px 16px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
+    position: relative;
+    overflow: hidden;
   }
+  .stat-card::before {
+    content:'';
+    position:absolute;
+    top:-20px; right:-20px;
+    width:70px; height:70px;
+    border-radius:50%;
+    pointer-events:none;
+    opacity: 0.04;
+  }
+  .stat-card:first-child::before { background: var(--accent2); }
+  .stat-card:last-child::before  { background: var(--accent); }
   .stat-card-label {
     font-size: 11px;
     color: var(--muted);
@@ -371,57 +409,60 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
-  .stat-card-label svg { width:13px; height:13px; }
+  .stat-card-label svg { width:12px; height:12px; }
   .stat-card-value {
     font-size: var(--text-lg);
     font-weight: 700;
     letter-spacing: -0.5px;
     font-variant-numeric: tabular-nums;
   }
-  .stat-card-value span { font-size: 12px; font-weight: 400; color: var(--muted); }
+  .stat-card-value span { font-size: 11px; font-weight: 400; color: var(--muted); }
 
   /* ── SELECTED SERVER ── */
   .selected-server {
-    margin: 0 var(--space-md) 20px;
+    margin: 0 20px 12px;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 18px;
+    border-radius: 18px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.2s, transform 0.15s;
     position: relative;
     overflow: hidden;
   }
   .selected-server::before {
     content:'';
-    position:absolute;
-    inset:0;
-    background: linear-gradient(135deg, rgba(108,99,255,0.04), transparent);
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(108,99,255,0.05), transparent);
     pointer-events:none;
   }
+  .selected-server:active { transform: scale(0.98); }
   .selected-server:hover { border-color: rgba(108,99,255,0.3); }
-  .flag svg { width:28px; height:28px; color: var(--accent2); }
-  .server-info { flex: 1; }
-  .server-arrow svg { width:16px; height:16px; }
-  .server-name { font-size: var(--text-base); font-weight: 600; }
+  .flag { display:flex; align-items:center; justify-content:center;
+          width:38px; height:38px; border-radius:12px;
+          background: rgba(0,212,255,0.08); flex-shrink:0; }
+  .flag svg { width:22px; height:22px; color: var(--accent2); }
+  .server-info { flex: 1; min-width:0; }
+  .server-name { font-size: 14px; font-weight: 600;
+                 white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .server-ping {
-    font-size: 12px;
-    color: var(--green);
-    margin-top: 2px;
-    display: flex; align-items: center; gap: 4px;
+    font-size: 12px; color: var(--green);
+    margin-top: 2px; display: flex; align-items: center; gap: 4px;
   }
   .ping-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
+    width: 6px; height: 6px; border-radius: 50%;
     background: var(--green);
     animation: ping-blink 2s ease infinite;
   }
   @keyframes ping-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .server-arrow { color: var(--muted); }
+  .server-arrow { color: var(--muted); flex-shrink:0; }
+  .server-arrow svg { width:16px; height:16px; }
 
   /* ── SERVERS SCREEN ── */
   .screen-title {
@@ -532,25 +573,33 @@
     border-radius: 14px;
     padding: 5px;
     margin: 20px 20px 0;
-    gap: 4px;
     border: 1px solid var(--border);
+    position: relative;
+  }
+  /* sliding pill */
+  .plan-toggle-pill {
+    position: absolute;
+    top: 5px; bottom: 5px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 2px 12px rgba(108,99,255,0.45);
+    transition: left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+    z-index: 0;
   }
   .plan-toggle-btn {
     flex:1; padding: 9px 4px; border-radius: 10px;
     font-size: 13px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
+    cursor: pointer;
     border: none; background: none;
     color: var(--muted); font-family: inherit;
-    position: relative;
+    position: relative; z-index: 1;
+    transition: color 0.2s;
   }
-  .plan-toggle-btn.active {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-    box-shadow: 0 2px 12px rgba(108,99,255,0.45);
-  }
+  .plan-toggle-btn.active { color: #fff; }
   .plan-toggle-btn .save-badge {
     position: absolute;
-    top: -8px; right: -4px;
+    top: -8px; right: -2px;
     font-size: 9px; font-weight: 700;
     background: var(--green);
     color: #000;
@@ -558,6 +607,12 @@
     border-radius: 10px;
     letter-spacing: 0.3px;
   }
+
+  /* price flip animation */
+  @keyframes price-in  { from { opacity:0; transform: translateY(8px);  } to { opacity:1; transform: translateY(0); } }
+  @keyframes price-out { from { opacity:1; transform: translateY(0);     } to { opacity:0; transform: translateY(-8px); } }
+  .price-flip-out { animation: price-out 0.15s ease forwards; }
+  .price-flip-in  { animation: price-in  0.2s ease 0.15s both; }
 
   /* ── PLAN CARDS fullwidth ── */
   .plan-cards {
@@ -973,7 +1028,7 @@
     <div class="screen-content">
     <div class="home-header fade-up">
       <div class="logo">MetRix VPN</div>
-      <div style="display:flex;align-items:center;gap:10px">
+      <div class="header-right">
         <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Change Theme">
           <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
         </button>
@@ -981,8 +1036,14 @@
       </div>
     </div>
 
+    <div class="ip-chip fade-up delay-1" id="ip-chip">
+      <div class="ip-dot" id="ip-dot"></div>
+      <span>IP:</span>
+      <span class="ip-val" id="ip-val">—.—.—.—</span>
+    </div>
+
     <div class="orb-section">
-      <div class="orb-ring fade-up delay-1">
+      <div class="orb-ring fade-up delay-2">
         <!-- SVG ring tracks -->
         <svg class="ring-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
           <defs>
@@ -1014,14 +1075,14 @@
         </button>
       </div>
 
-      <div class="conn-status fade-up delay-2">
+      <div class="conn-status fade-up delay-3">
         <div class="conn-status-label" id="conn-status-label">Disconnected</div>
         <div class="conn-status-sub" id="conn-status-sub">Tap to connect</div>
         <div class="conn-timer" id="conn-timer" style="display:none">00:00:00</div>
       </div>
     </div>
 
-    <div class="selected-server fade-up delay-3" onclick="navigate('servers')">
+    <div class="selected-server fade-up delay-4" onclick="navigate('servers')">
       <div class="flag" id="selected-flag">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
       </div>
@@ -1034,7 +1095,7 @@
       </div>
     </div>
 
-    <div class="stats-row fade-up delay-4">
+    <div class="stats-row fade-up delay-5">
       <div class="stat-card">
         <div class="stat-card-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -1174,7 +1235,8 @@
       <div class="plans-sub" id="plans-sub-txt">Choose your plan</div>
     </div>
 
-    <div class="plan-toggle fade-up delay-1">
+    <div class="plan-toggle fade-up delay-1" id="plan-toggle">
+      <div class="plan-toggle-pill" id="toggle-pill"></div>
       <button class="plan-toggle-btn active" onclick="setPeriod('monthly', this)" id="ptbtn-monthly">Monthly</button>
       <button class="plan-toggle-btn" onclick="setPeriod('quarterly', this)" id="ptbtn-quarterly">3 Months<span class="save-badge">-20%</span></button>
       <button class="plan-toggle-btn" onclick="setPeriod('yearly', this)" id="ptbtn-yearly">Yearly<span class="save-badge">-40%</span></button>
@@ -1523,6 +1585,7 @@ function toggleConnect() {
       glow.classList.add('green');
       pulse.classList.add('active');
 
+      setIPSecure(true);
       seconds = 0;
       timer = setInterval(() => {
         seconds++;
@@ -1549,6 +1612,7 @@ function toggleConnect() {
     glow.classList.remove('green');
     pulse.classList.remove('active');
 
+    setIPSecure(false);
     clearInterval(timer);
     clearInterval(statsTimer);
     document.getElementById('stat-up').innerHTML = '0.0 <span>MB/s</span>';
@@ -1609,11 +1673,61 @@ function toggleTheme() {
 
 // ── Plan Toggle ──
 const prices = { monthly: ['$4.99', '/ mo'], quarterly: ['$3.99', '/ mo'], yearly: ['$2.99', '/ mo'] };
+
+function movePill(btn) {
+  const pill = document.getElementById('toggle-pill');
+  const toggle = document.getElementById('plan-toggle');
+  if (!pill || !toggle) return;
+  const tr = toggle.getBoundingClientRect();
+  const br = btn.getBoundingClientRect();
+  pill.style.left  = (br.left - tr.left) + 'px';
+  pill.style.width = br.width + 'px';
+}
+
 function setPeriod(period, btn) {
   document.querySelectorAll('.plan-toggle-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('plan-price').textContent = prices[period][0];
-  document.getElementById('plan-period').textContent = prices[period][1];
+  movePill(btn);
+
+  const priceEl  = document.getElementById('plan-price');
+  const periodEl = document.getElementById('plan-period');
+  const entry = (window._prices || prices)[period] || prices[period];
+
+  // price flip animation
+  if (priceEl) {
+    priceEl.classList.remove('price-flip-in', 'price-flip-out');
+    void priceEl.offsetWidth;
+    priceEl.classList.add('price-flip-out');
+    setTimeout(() => {
+      priceEl.textContent = entry[0];
+      priceEl.classList.remove('price-flip-out');
+      priceEl.classList.add('price-flip-in');
+    }, 150);
+  }
+  if (periodEl) periodEl.textContent = entry[1];
+}
+
+// init pill position on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  const active = document.querySelector('.plan-toggle-btn.active');
+  if (active) movePill(active);
+  fetchPublicIP();
+});
+
+// ── IP Chip ──
+function fetchPublicIP() {
+  fetch('https://api.ipify.org?format=json')
+    .then(r => r.json())
+    .then(d => {
+      const el = document.getElementById('ip-val');
+      if (el) el.textContent = d.ip;
+    })
+    .catch(() => {});
+}
+
+function setIPSecure(secure) {
+  const dot = document.getElementById('ip-dot');
+  if (dot) dot.classList.toggle('secure', secure);
 }
 
 // ── i18n Translations ──
