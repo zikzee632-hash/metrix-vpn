@@ -520,7 +520,7 @@
 
   /* ── PLANS SCREEN ── */
   .plans-header {
-    padding: 20px 24px 0;
+    padding: 24px 24px 0;
     text-align: center;
   }
   .plans-title { font-size: var(--text-xl); font-weight: 700; letter-spacing: -0.5px; }
@@ -529,97 +529,193 @@
   .plan-toggle {
     display: flex;
     background: var(--card);
-    border-radius: 12px;
-    padding: 4px;
-    margin: 20px 24px;
+    border-radius: 14px;
+    padding: 5px;
+    margin: 20px 20px 0;
     gap: 4px;
+    border: 1px solid var(--border);
   }
   .plan-toggle-btn {
-    flex:1; padding: 8px; border-radius: 9px;
+    flex:1; padding: 9px 4px; border-radius: 10px;
     font-size: 13px; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
     border: none; background: none;
     color: var(--muted); font-family: inherit;
+    position: relative;
   }
   .plan-toggle-btn.active {
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
     color: #fff;
-    box-shadow: 0 2px 10px rgba(108,99,255,0.4);
+    box-shadow: 0 2px 12px rgba(108,99,255,0.45);
+  }
+  .plan-toggle-btn .save-badge {
+    position: absolute;
+    top: -8px; right: -4px;
+    font-size: 9px; font-weight: 700;
+    background: var(--green);
+    color: #000;
+    padding: 1px 5px;
+    border-radius: 10px;
+    letter-spacing: 0.3px;
   }
 
-  .plan-cards { padding: 0 var(--space-md); display: flex; flex-direction: column; gap: 14px; }
+  /* ── PLAN CARDS fullwidth ── */
+  .plan-cards {
+    padding: 16px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-  .plan-card {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
+  .plan-card-fw {
+    border-radius: 20px;
+    padding: 22px 20px;
     cursor: pointer;
-    transition: all 0.25s;
+    transition: transform 0.2s;
     position: relative;
     overflow: hidden;
   }
-  .plan-card:hover { border-color: rgba(108,99,255,0.4); transform: translateY(-2px); }
-  .plan-card.popular {
-    border-color: var(--accent);
-    background: linear-gradient(145deg, rgba(108,99,255,0.08), var(--card));
+  .plan-card-fw:active { transform: scale(0.98); }
+
+  /* Free card */
+  .plan-card-fw.free {
+    background: var(--card);
+    border: 1.5px solid var(--border);
   }
-  .popular-tag {
-    position: absolute;
-    top: 16px;
-    left: 16px;
+
+  /* Pro card — gradient */
+  .plan-card-fw.pro {
+    background: linear-gradient(145deg, #3730a3 0%, #1e40af 40%, #0369a1 100%);
+    border: none;
+    box-shadow: 0 8px 32px rgba(108,99,255,0.35);
+  }
+  :root.light .plan-card-fw.pro {
+    background: linear-gradient(145deg, #6C63FF 0%, #00D4FF 100%);
+  }
+
+  /* decorative circles on Pro card */
+  .plan-card-fw.pro::before {
+    content:'';
+    position:absolute;
+    top:-40px; right:-40px;
+    width:160px; height:160px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.06);
+    pointer-events:none;
+  }
+  .plan-card-fw.pro::after {
+    content:'';
+    position:absolute;
+    bottom:-30px; left:-20px;
+    width:100px; height:100px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events:none;
+  }
+
+  .plan-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .plan-card-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .plan-card-fw.pro .plan-card-name { color: #fff; }
+
+  .plan-badge-popular {
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    letter-spacing: 0.8px;
+    background: rgba(255,255,255,0.2);
     color: #fff;
-    padding: 3px 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .plan-badge-free {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    background: var(--surface);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
     border-radius: 20px;
   }
 
-  .plan-name { font-size: 16px; font-weight: 700; }
-  .plan-price-row { display: flex; align-items: baseline; gap: 4px; margin: 10px 0; }
-  .plan-price { font-size: var(--text-xl); font-weight: 700; letter-spacing: -1px; }
-  .plan-period { font-size: 13px; color: var(--muted); }
-  .plan-features { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-  .plan-feature {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--muted);
+  .plan-price-big {
+    font-size: clamp(32px, 9vw, 42px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1;
   }
-  .plan-feature-check {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: rgba(0,229,160,0.1);
-    color: var(--green);
+  .plan-card-fw.pro .plan-price-big { color: #fff; }
+  .plan-price-period {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .plan-card-fw.pro .plan-price-period { color: rgba(255,255,255,0.65); }
+
+  .plan-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+  .plan-card-fw.pro .plan-divider { background: rgba(255,255,255,0.12); }
+
+  .plan-features-fw {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .plan-feat-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
+  .plan-card-fw.free .plan-feat-row { color: var(--muted); }
+  .plan-card-fw.pro .plan-feat-row { color: rgba(255,255,255,0.9); }
+  .plan-feat-icon {
+    width: 20px; height: 20px;
+    border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px;
     flex-shrink: 0;
   }
+  .plan-feat-icon.yes { background: rgba(0,229,160,0.15); }
+  .plan-feat-icon.no  { background: rgba(255,75,110,0.1); }
+  .plan-card-fw.pro .plan-feat-icon.yes { background: rgba(255,255,255,0.15); }
 
-  .plan-btn {
+  .plan-cta {
     width: 100%;
-    padding: 13px;
-    border-radius: 12px;
+    padding: 15px;
+    border-radius: 14px;
     border: none;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
     transition: all 0.2s;
-    margin-top: 16px;
     letter-spacing: 0.3px;
   }
-  .plan-btn.primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(108,99,255,0.35);
-  }
-  .plan-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(108,99,255,0.5); }
-  .plan-btn.outline {
-    background: transparent;
+  .plan-cta.free-cta {
+    background: var(--surface);
     border: 1.5px solid var(--border);
     color: var(--text);
   }
+  .plan-cta.pro-cta {
+    background: #fff;
+    color: #3730a3;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .plan-cta.pro-cta:active { transform: scale(0.98); }
 
   /* ── PROFILE SCREEN ── */
   .profile-header {
@@ -1071,50 +1167,84 @@
 
   <!-- ════════════ PLANS ════════════ -->
   <div class="screen" id="screen-plans">
+    <div class="screen-content">
+
     <div class="plans-header fade-up">
-      <div class="plans-title">Subscription</div>
-      <div class="plans-sub">Buy once, access all servers</div>
+      <div class="plans-title" id="plans-title-txt">Subscription</div>
+      <div class="plans-sub" id="plans-sub-txt">Choose your plan</div>
     </div>
 
     <div class="plan-toggle fade-up delay-1">
-      <button class="plan-toggle-btn active" onclick="setPeriod('monthly', this)">Monthly</button>
-      <button class="plan-toggle-btn" onclick="setPeriod('quarterly', this)">3 Months</button>
-      <button class="plan-toggle-btn" onclick="setPeriod('yearly', this)">Yearly</button>
+      <button class="plan-toggle-btn active" onclick="setPeriod('monthly', this)" id="ptbtn-monthly">Monthly</button>
+      <button class="plan-toggle-btn" onclick="setPeriod('quarterly', this)" id="ptbtn-quarterly">3 Months<span class="save-badge">-20%</span></button>
+      <button class="plan-toggle-btn" onclick="setPeriod('yearly', this)" id="ptbtn-yearly">Yearly<span class="save-badge">-40%</span></button>
     </div>
 
     <div class="plan-cards">
-      <div class="plan-card fade-up delay-2">
-        <div class="plan-name">Free</div>
-        <div class="plan-price-row">
-          <div class="plan-price">$0</div>
-          <div class="plan-period">forever</div>
+
+      <!-- FREE -->
+      <div class="plan-card-fw free fade-up delay-2">
+        <div class="plan-card-top">
+          <div class="plan-card-name" id="plan-name-free">Free</div>
+          <div class="plan-badge-free" id="plan-badge-free">Forever</div>
         </div>
-        <div class="plan-features">
-          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> 1 Server (Netherlands)</div>
-          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> 1 GB per day</div>
-          <div class="plan-feature" style="opacity:0.4"><div class="plan-feature-check" style="background:rgba(255,75,110,0.1);color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3" width="9" height="9"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div> Premium servers</div>
+        <div class="plan-price-big">$0</div>
+        <div class="plan-price-period" id="plan-free-period">No credit card needed</div>
+        <div class="plan-divider"></div>
+        <div class="plan-features-fw">
+          <div class="plan-feat-row">
+            <div class="plan-feat-icon yes"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span id="feat-free-1">1 Server (Netherlands)</span>
+          </div>
+          <div class="plan-feat-row">
+            <div class="plan-feat-icon yes"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span id="feat-free-2">1 GB per day</span>
+          </div>
+          <div class="plan-feat-row" style="opacity:0.45">
+            <div class="plan-feat-icon no"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+            <span id="feat-free-3">Premium servers</span>
+          </div>
+          <div class="plan-feat-row" style="opacity:0.45">
+            <div class="plan-feat-icon no"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+            <span id="feat-free-4">Priority support</span>
+          </div>
         </div>
-        <button class="plan-btn outline">Continue Free</button>
+        <button class="plan-cta free-cta" id="btn-free">Continue Free</button>
       </div>
 
-      <div class="plan-card popular fade-up delay-3">
-        <div class="popular-tag">Most Popular</div>
-        <div class="plan-name" style="margin-top:28px">Pro</div>
-        <div class="plan-price-row">
-          <div class="plan-price" id="plan-price">$4.99</div>
-          <div class="plan-period" id="plan-period">/ mo</div>
+      <!-- PRO -->
+      <div class="plan-card-fw pro fade-up delay-3">
+        <div class="plan-card-top">
+          <div class="plan-card-name" id="plan-name-pro">Pro</div>
+          <div class="plan-badge-popular" id="plan-badge-popular">Most Popular</div>
         </div>
-        <div class="plan-features">
-          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> All servers unlimited</div>
-          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> Full speed</div>
-          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> 24/7 Support</div>
-          <div class="plan-feature"><div class="plan-feature-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg></div> Up to 3 devices</div>
+        <div class="plan-price-big" id="plan-price">$4.99</div>
+        <div class="plan-price-period" id="plan-period">per month</div>
+        <div class="plan-divider"></div>
+        <div class="plan-features-fw">
+          <div class="plan-feat-row">
+            <div class="plan-feat-icon yes"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span id="feat-pro-1">All servers unlimited</span>
+          </div>
+          <div class="plan-feat-row">
+            <div class="plan-feat-icon yes"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span id="feat-pro-2">Full speed</span>
+          </div>
+          <div class="plan-feat-row">
+            <div class="plan-feat-icon yes"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span id="feat-pro-3">24/7 Support</span>
+          </div>
+          <div class="plan-feat-row">
+            <div class="plan-feat-icon yes"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span id="feat-pro-4">Up to 3 devices</span>
+          </div>
         </div>
-        <button class="plan-btn primary">Get Pro</button>
+        <button class="plan-cta pro-cta" id="btn-pro">Get Pro</button>
       </div>
+
     </div>
-
-    <div class="spacer"></div>
+    <div style="height:16px"></div>
+    </div><!-- /screen-content -->
 
     <div class="bottom-nav">
       <button class="nav-item" onclick="navigate('home')">
@@ -1506,6 +1636,7 @@ const translations = {
     oneServer: '1 Server (Netherlands)', onegbDay: '1 GB per day', premiumServers: 'Premium servers',
     unlimitedServers: 'All servers unlimited', fullSpeed: 'Full speed',
     support247: '24/7 Support', devices3: 'Up to 3 devices',
+    prioritySupport: 'Priority support',
     continueFree: 'Continue Free', buyPro: 'Get Pro',
     upload: 'Upload', download: 'Download',
     account: 'ACCOUNT', settings: 'SETTINGS',
@@ -1535,6 +1666,7 @@ const translations = {
     oneServer: '1 Server (Netherlands)', onegbDay: '1 GB per day', premiumServers: 'Premium servers',
     unlimitedServers: 'All servers unlimited', fullSpeed: 'Full speed',
     support247: '24/7 Support', devices3: 'Up to 3 devices',
+    prioritySupport: 'پشتیبانی اولویت‌دار',
     continueFree: 'ادامه با رایگان', buyPro: 'خرید پرو',
     upload: 'آپلود', download: 'دانلود',
     account: 'اکانت', settings: 'تنظیمات',
@@ -1563,7 +1695,7 @@ const translations = {
     mostPopular: 'الأكثر شعبية',
     oneServer: 'خادم واحد', onegbDay: '١ جيجا يومياً', premiumServers: 'خوادم مميزة',
     unlimitedServers: 'جميع الخوادم', fullSpeed: 'سرعة كاملة',
-    support247: 'دعم ٢٤/٧', devices3: 'حتى ٣ أجهزة',
+    support247: 'دعم ٢٤/٧', devices3: 'حتى ٣ أجهزة', prioritySupport: 'دعم أولوية',
     continueFree: 'استمرار مجاني', buyPro: 'شراء برو',
     upload: 'رفع', download: 'تنزيل',
     account: 'الحساب', settings: 'الإعدادات',
@@ -1592,7 +1724,7 @@ const translations = {
     mostPopular: 'Популярное',
     oneServer: '1 Сервер', onegbDay: '1 ГБ в день', premiumServers: 'Премиум серверы',
     unlimitedServers: 'Все серверы', fullSpeed: 'Полная скорость',
-    support247: 'Поддержка 24/7', devices3: 'До 3 устройств',
+    support247: 'Поддержка 24/7', devices3: 'До 3 устройств', prioritySupport: 'Приоритетная поддержка',
     continueFree: 'Продолжить бесплатно', buyPro: 'Купить Про',
     upload: 'Загрузка', download: 'Скачивание',
     account: 'АККАУНТ', settings: 'НАСТРОЙКИ',
@@ -1621,7 +1753,7 @@ const translations = {
     mostPopular: 'En Popüler',
     oneServer: '1 Sunucu', onegbDay: 'Günlük 1 GB', premiumServers: 'Premium sunucular',
     unlimitedServers: 'Tüm sunucular', fullSpeed: 'Tam hız',
-    support247: '7/24 Destek', devices3: '3 cihaza kadar',
+    support247: '7/24 Destek', devices3: '3 cihaza kadar', prioritySupport: 'Öncelikli destek',
     continueFree: 'Ücretsiz devam et', buyPro: 'Pro Satın Al',
     upload: 'Yükleme', download: 'İndirme',
     account: 'HESAP', settings: 'AYARLAR',
@@ -1650,7 +1782,7 @@ const translations = {
     mostPopular: '最受欢迎',
     oneServer: '1个服务器', onegbDay: '每天1GB', premiumServers: '高级服务器',
     unlimitedServers: '所有服务器', fullSpeed: '全速',
-    support247: '24/7支持', devices3: '最多3台设备',
+    support247: '24/7支持', devices3: '最多3台设备', prioritySupport: '优先支持',
     continueFree: '免费继续', buyPro: '购买专业版',
     upload: '上传', download: '下载',
     account: '账户', settings: '设置',
@@ -1719,44 +1851,40 @@ function applyLang(code) {
   serverNames.forEach((el, i) => { if (serverKeys[i]) el.textContent = t[serverKeys[i]]; });
 
   // plan toggle buttons
-  const planBtns = document.querySelectorAll('.plan-toggle-btn');
-  if (planBtns[0]) planBtns[0].textContent = t.monthly;
-  if (planBtns[1]) planBtns[1].textContent = t.quarterly;
-  if (planBtns[2]) planBtns[2].textContent = t.yearly;
+  const ptbMonthly = document.getElementById('ptbtn-monthly');
+  const ptbQuarterly = document.getElementById('ptbtn-quarterly');
+  const ptbYearly = document.getElementById('ptbtn-yearly');
+  if (ptbMonthly) ptbMonthly.childNodes[0].textContent = t.monthly;
+  if (ptbQuarterly) ptbQuarterly.childNodes[0].textContent = t.quarterly;
+  if (ptbYearly) ptbYearly.childNodes[0].textContent = t.yearly;
+
+  // plans header
+  const plansTitle = document.getElementById('plans-title-txt');
+  if (plansTitle) plansTitle.textContent = t.subscription;
+
+  // plan names & badges
+  const pnFree = document.getElementById('plan-name-free');
+  const pnPro  = document.getElementById('plan-name-pro');
+  if (pnFree) pnFree.textContent = t.free;
+  if (pnPro)  pnPro.textContent  = t.pro;
+
+  const popTag = document.getElementById('plan-badge-popular');
+  if (popTag) popTag.textContent = t.mostPopular;
 
   // plan period
   const pp = document.getElementById('plan-period');
   if (pp) pp.textContent = t.perMonth;
 
-  // popular tag
-  const popTag = document.querySelector('.popular-tag');
-  if (popTag) popTag.textContent = t.mostPopular;
-
-  // plan names
-  const planNames = document.querySelectorAll('.plan-name');
-  if (planNames[0]) planNames[0].textContent = t.free;
-  if (planNames[1]) planNames[1].textContent = t.pro;
-
   // plan features
-  const features = document.querySelectorAll('.plan-feature');
-  const featureKeys = ['oneServer','onegbDay','premiumServers','unlimitedServers','fullSpeed','support247','devices3'];
-  features.forEach((el, i) => {
-    if (featureKeys[i]) {
-      const check = el.querySelector('.plan-feature-check');
-      el.textContent = ' ' + t[featureKeys[i]];
-      if (check) el.insertBefore(check, el.firstChild);
-    }
-  });
+  const fk = ['feat-free-1','feat-free-2','feat-free-3','feat-free-4','feat-pro-1','feat-pro-2','feat-pro-3','feat-pro-4'];
+  const fv = ['oneServer','onegbDay','premiumServers','prioritySupport','unlimitedServers','fullSpeed','support247','devices3'];
+  fk.forEach((id,i) => { const el=document.getElementById(id); if(el && t[fv[i]]) el.textContent=t[fv[i]]; });
 
   // plan buttons
-  const planBtnPrimary = document.querySelector('.plan-btn.primary');
-  const planBtnOutline = document.querySelector('.plan-btn.outline');
-  if (planBtnPrimary) planBtnPrimary.textContent = t.buyPro;
-  if (planBtnOutline) planBtnOutline.textContent = t.continueFree;
-
-  // plans header
-  const plansTitle = document.querySelector('.plans-title');
-  if (plansTitle) plansTitle.textContent = t.subscription;
+  const btnPro  = document.getElementById('btn-pro');
+  const btnFree = document.getElementById('btn-free');
+  if (btnPro)  btnPro.textContent  = t.buyPro;
+  if (btnFree) btnFree.textContent = t.continueFree;
 
   // profile name
   const pname = document.querySelector('.profile-name');
