@@ -1475,8 +1475,9 @@
     <div class="home-proto-card fade-up delay-3">
       <div class="hpc-label">Protocol</div>
       <div class="hpc-pills">
-        <button class="hpill active" id="hpill-VLESS" onclick="setHomeProtocol('VLESS')">OpenVPN-UDP</button>
-        <button class="hpill"        id="hpill-VMess" onclick="setHomeProtocol('VMess')">OpenVPN-TCP</button>
+        <button class="hpill active" id="hpill-VLESS"  onclick="setHomeProtocol('VLESS')">OpenVPN-UDP</button>
+        <button class="hpill"        id="hpill-VMess"  onclick="setHomeProtocol('VMess')">OpenVPN-TCP</button>
+        <button class="hpill"        id="hpill-Trojan" onclick="setHomeProtocol('Trojan')">WireGuard</button>
       </div>
     </div>
 
@@ -1881,6 +1882,10 @@
           <div><div class="protocol-name">OpenVPN-TCP</div><div class="protocol-desc">Reliable — bypasses strict firewalls</div></div>
           <div class="protocol-check" id="proto-VMess"></div>
         </div>
+        <div class="protocol-option" onclick="setProtocol('Trojan',this)">
+          <div><div class="protocol-name">WireGuard</div><div class="protocol-desc">Modern & ultra-fast protocol</div></div>
+          <div class="protocol-check" id="proto-Trojan"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -2249,10 +2254,10 @@ function selectServer(el, name, ping, flagCode) {
   setTimeout(() => navigate('home'), 300);
 }
 
-const PROTO_LABELS = { VLESS: 'OpenVPN-UDP', VMess: 'OpenVPN-TCP' };
+const PROTO_LABELS = { VLESS: 'OpenVPN-UDP', VMess: 'OpenVPN-TCP', Trojan: 'WireGuard' };
 function setHomeProtocol(name) {
   currentProtocol = name;
-  ['VLESS','VMess'].forEach(p => {
+  ['VLESS','VMess','Trojan'].forEach(p => {
     const h = document.getElementById('hpill-' + p);
     if (h) h.classList.toggle('active', p === name);
     const pr = document.getElementById('proto-' + p);
@@ -2749,7 +2754,7 @@ function toggleNotif() {
 
 let currentProtocol = 'VLESS';
 function setProtocol(name) {
-  ['VLESS','VMess'].forEach(p => {
+  ['VLESS','VMess','Trojan'].forEach(p => {
     const el = document.getElementById('proto-' + p);
     if (el) el.classList.toggle('active', p === name);
   });
