@@ -509,13 +509,13 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    padding: 0 20px 16px;
+    margin: 10px 16px 16px;
   }
   .stat-card {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 18px;
-    padding: 14px 16px;
+    padding: 14px 14px 12px;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -529,28 +529,28 @@
     width:70px; height:70px;
     border-radius:50%;
     pointer-events:none;
-    opacity: 0.04;
+    opacity: 0.05;
   }
   .stat-card:first-child::before { background: var(--accent2); }
   .stat-card:last-child::before  { background: var(--accent); }
   .stat-card-label {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--muted);
-    font-weight: 500;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 5px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
   }
-  .stat-card-label svg { width:12px; height:12px; }
+  .stat-card-label svg { width:11px; height:11px; }
   .stat-card-value {
-    font-size: var(--text-lg);
+    font-size: var(--text-md);
     font-weight: 700;
     letter-spacing: -0.5px;
     font-variant-numeric: tabular-nums;
   }
-  .stat-card-value span { font-size: 11px; font-weight: 400; color: var(--muted); }
+  .stat-card-value span { font-size: 10px; font-weight: 400; color: var(--muted); }
 
   /* ── SELECTED SERVER ── */
   .selected-server {
@@ -1376,25 +1376,25 @@
 
   .home-proto-card {
     background:var(--card); border:1px solid var(--border); border-radius:18px;
-    padding:13px 14px; display:flex; flex-direction:column; gap:8px;
+    padding:13px 14px; display:flex; flex-direction:column; gap:7px;
   }
   .hpc-label {
     font-size:9px; font-weight:700; letter-spacing:0.9px;
     text-transform:uppercase; color:var(--muted);
   }
-  .hpc-pills { display:flex; flex-direction:column; gap:5px; }
+  .hpc-pills { display:flex; gap:5px; }
   .hpill {
-    padding:5px 0; border-radius:8px;
-    border:1px solid var(--border); background:transparent;
-    color:var(--muted); font-size:11px; font-weight:600;
-    font-family:inherit; cursor:pointer; transition:all 0.2s;
-    -webkit-tap-highlight-color:transparent; text-align:center; letter-spacing:0.3px;
+    flex:1; padding:6px 0; border-radius:9px;
+    border:1px solid var(--border); background:var(--surface);
+    color:var(--muted); font-size:10px; font-weight:700;
+    letter-spacing:0.3px; font-family:inherit; cursor:pointer;
+    transition:all 0.2s; -webkit-tap-highlight-color:transparent; text-align:center;
   }
   .hpill.active {
-    background:rgba(108,99,255,0.12); border-color:rgba(108,99,255,0.38);
-    color:var(--accent);
+    background:rgba(108,99,255,0.14); border-color:rgba(108,99,255,0.4);
+    color:var(--accent); box-shadow:0 2px 8px rgba(108,99,255,0.15);
   }
-  .hpill:active { transform:scale(0.95); }
+  .hpill:active { transform:scale(0.94); }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -2074,6 +2074,12 @@ function mapSetConnected(on) {
       color: '#6C63FF', weight: 2, opacity: 0.75,
       dashArray: '6,5', dashOffset: '0'
     }).addTo(_map);
+    // zoom into server location
+    const ll = _mapPinMarker.getLatLng();
+    _map.flyTo([ll.lat - 3, ll.lng], 4, { duration: 1.6, easeLinearity: 0.35 });
+  } else if (_map) {
+    // zoom back to world overview
+    _map.flyTo([25, 18], 2, { duration: 1.2, easeLinearity: 0.4 });
   }
   const badge = document.getElementById('map-server-badge');
   if (badge) {
