@@ -1270,42 +1270,50 @@
   }
   .map-server-badge.show { opacity:1; }
 
-  /* ── HOME CONNECT BUTTON ── */
-  .home-connect-btn {
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    margin:12px 16px 0; padding:15px 24px; border-radius:18px; border:none;
-    cursor:pointer; font-family:inherit; font-size:14px; font-weight:800;
-    letter-spacing:1.2px; width:calc(100% - 32px);
-    background:linear-gradient(135deg,#6C63FF 0%,#00D4FF 100%);
-    color:#fff;
-    box-shadow:0 8px 28px rgba(108,99,255,0.4),inset 0 1px 0 rgba(255,255,255,0.2);
-    transition:all 0.3s cubic-bezier(.4,0,.2,1);
-    -webkit-tap-highlight-color:transparent;
+  /* ── CONNECTION CARD ── */
+  .conn-card {
+    margin:10px 16px 0;
+    background:var(--card); border:1px solid var(--border); border-radius:22px;
+    padding:16px 18px; display:flex; flex-direction:column; gap:14px;
+    position:relative; overflow:hidden;
   }
-  .home-connect-btn.connected {
-    background:linear-gradient(135deg,#00E5A0 0%,#00B377 100%);
-    box-shadow:0 8px 28px rgba(0,229,160,0.38),inset 0 1px 0 rgba(255,255,255,0.2);
+  .conn-card::before {
+    content:''; position:absolute; top:-50px; right:-40px;
+    width:160px; height:160px; border-radius:50%;
+    background:radial-gradient(circle,rgba(108,99,255,0.07),transparent);
+    pointer-events:none; transition:background 0.5s;
   }
-  .home-connect-btn.connecting {
-    opacity:0.72;
-    animation:btn-breathe 1s ease-in-out infinite;
+  .conn-card:has(#home-connect-btn.connected)::before {
+    background:radial-gradient(circle,rgba(0,229,160,0.06),transparent);
   }
-  @keyframes btn-breathe {
-    0%,100% { box-shadow:0 8px 28px rgba(108,99,255,0.35); }
-    50%      { box-shadow:0 8px 38px rgba(108,99,255,0.65); }
+  .conn-top { display:flex; align-items:center; gap:14px; }
+  .conn-shield-wrap {
+    position:relative; width:52px; height:52px; flex-shrink:0;
+    background:rgba(108,99,255,0.09); border-radius:16px;
+    border:1px solid rgba(108,99,255,0.18);
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.45s, border-color 0.45s;
   }
-  .home-connect-btn:active { transform:scale(0.97); }
-  .home-connect-btn svg { width:19px; height:19px; flex-shrink:0; }
-  #home-conn-timer {
-    font-size:11px; font-weight:500; opacity:0.75;
-    letter-spacing:0.4px; display:none; margin-left:2px;
+  .conn-card:has(#home-connect-btn.connected) .conn-shield-wrap {
+    background:rgba(0,229,160,0.09); border-color:rgba(0,229,160,0.22);
   }
-
-  /* ── HOME STATUS ROW ── */
-  .home-status-row {
-    display:flex; align-items:center; gap:8px;
-    margin:8px 16px 0; padding:9px 14px;
-    background:var(--card); border:1px solid var(--border); border-radius:14px;
+  .conn-shield-icon {
+    width:28px; height:28px; color:var(--accent);
+    filter:drop-shadow(0 0 7px rgba(108,99,255,0.55));
+    transition:color 0.4s, filter 0.4s;
+  }
+  .conn-card:has(#home-connect-btn.connected) .conn-shield-icon {
+    color:var(--green); filter:drop-shadow(0 0 9px rgba(0,229,160,0.7));
+  }
+  .conn-meta { flex:1; min-width:0; }
+  .conn-state {
+    font-size:15px; font-weight:800; letter-spacing:0.4px;
+    color:var(--text); transition:color 0.3s; line-height:1.2;
+  }
+  .conn-detail {
+    display:flex; align-items:center; gap:6px;
+    margin-top:5px; font-size:12px; color:var(--muted);
+    font-variant-numeric:tabular-nums;
   }
   .home-status-dot {
     width:7px; height:7px; border-radius:50%;
@@ -1314,28 +1322,79 @@
   .home-status-dot.on { background:var(--green); box-shadow:0 0 7px var(--green); }
   .home-status-dot.going { background:var(--accent); animation:dot-blink 0.8s ease-in-out infinite; }
   @keyframes dot-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .home-status-lbl { font-size:12.5px; font-weight:600; color:var(--text); }
-  .home-status-ip  { font-size:11px; color:var(--muted); margin-left:auto; font-variant-numeric:tabular-nums; }
+  #home-conn-timer { display:none; color:var(--green); font-weight:600; font-size:11px; }
 
-  /* ── PROTOCOL PILLS (home) ── */
-  .proto-row { padding:8px 16px 0; }
-  .proto-row-label {
-    font-size:9.5px; font-weight:700; letter-spacing:0.8px;
-    text-transform:uppercase; color:var(--muted); margin-bottom:6px;
+  /* connect button */
+  .conn-btn {
+    display:flex; align-items:center; justify-content:center;
+    padding:15px; border-radius:14px; border:none;
+    cursor:pointer; font-family:inherit; font-size:14px; font-weight:800;
+    letter-spacing:1.5px; color:#fff;
+    background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
+    box-shadow:0 6px 24px rgba(108,99,255,0.38),inset 0 1px 0 rgba(255,255,255,0.18);
+    transition:all 0.3s cubic-bezier(.4,0,.2,1);
+    -webkit-tap-highlight-color:transparent;
   }
-  .proto-pills { display:flex; gap:6px; }
-  .proto-pill {
-    flex:1; padding:7px 4px; border-radius:10px;
-    border:1px solid var(--border); background:var(--card);
-    color:var(--muted); font-size:10.5px; font-weight:700;
-    letter-spacing:0.4px; font-family:inherit; cursor:pointer;
-    transition:all 0.2s; -webkit-tap-highlight-color:transparent;
+  .conn-btn.connected {
+    background:linear-gradient(135deg,#00E5A0 0%,#00B377 100%);
+    box-shadow:0 6px 24px rgba(0,229,160,0.35),inset 0 1px 0 rgba(255,255,255,0.18);
   }
-  .proto-pill.active {
-    background:rgba(108,99,255,0.14); border-color:rgba(108,99,255,0.45);
-    color:var(--accent); box-shadow:0 2px 8px rgba(108,99,255,0.18);
+  .conn-btn.connecting { opacity:0.72; animation:btn-breathe 1s ease-in-out infinite; }
+  @keyframes btn-breathe {
+    0%,100% { box-shadow:0 6px 24px rgba(108,99,255,0.35); }
+    50%      { box-shadow:0 6px 36px rgba(108,99,255,0.65); }
   }
-  .proto-pill:active { transform:scale(0.94); }
+  .conn-btn:active { transform:scale(0.97); }
+
+  /* ── HOME BOTTOM ROW ── */
+  .home-row {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:10px; padding:10px 16px 0;
+  }
+  .home-server-card {
+    background:var(--card); border:1px solid var(--border); border-radius:18px;
+    padding:13px 14px; display:flex; align-items:center; gap:10px;
+    cursor:pointer; transition:border-color 0.2s,transform 0.15s;
+    -webkit-tap-highlight-color:transparent; overflow:hidden; position:relative;
+  }
+  .home-server-card::before {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(135deg,rgba(108,99,255,0.04),transparent);
+    pointer-events:none;
+  }
+  .home-server-card:active { transform:scale(0.97); }
+  .home-server-card:hover { border-color:rgba(108,99,255,0.3); }
+  .hs-flag { flex-shrink:0; }
+  .hs-flag img { border-radius:3px; object-fit:cover; display:block; }
+  .hs-info { flex:1; min-width:0; }
+  .hs-name {
+    font-size:12px; font-weight:700;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .hs-ping { font-size:10px; color:var(--green); margin-top:3px; display:flex; align-items:center; gap:3px; }
+  .hs-arrow { color:var(--muted); flex-shrink:0; }
+
+  .home-proto-card {
+    background:var(--card); border:1px solid var(--border); border-radius:18px;
+    padding:13px 14px; display:flex; flex-direction:column; gap:8px;
+  }
+  .hpc-label {
+    font-size:9px; font-weight:700; letter-spacing:0.9px;
+    text-transform:uppercase; color:var(--muted);
+  }
+  .hpc-pills { display:flex; flex-direction:column; gap:5px; }
+  .hpill {
+    padding:5px 0; border-radius:8px;
+    border:1px solid var(--border); background:transparent;
+    color:var(--muted); font-size:11px; font-weight:600;
+    font-family:inherit; cursor:pointer; transition:all 0.2s;
+    -webkit-tap-highlight-color:transparent; text-align:center; letter-spacing:0.3px;
+  }
+  .hpill.active {
+    background:rgba(108,99,255,0.12); border-color:rgba(108,99,255,0.38);
+    color:var(--accent);
+  }
+  .hpill:active { transform:scale(0.95); }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1372,41 +1431,47 @@
       <div class="map-server-badge" id="map-server-badge"></div>
     </div>
 
-    <!-- Connect Button -->
-    <button class="home-connect-btn fade-up delay-2" id="home-connect-btn" onclick="toggleConnect()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <span id="home-btn-label">CONNECT</span>
-      <span id="home-conn-timer"></span>
-    </button>
-
-    <!-- Status Row (IP + state) -->
-    <div class="home-status-row fade-up delay-2">
-      <div class="home-status-dot" id="home-status-dot"></div>
-      <div class="home-status-lbl" id="home-status-lbl">Disconnected</div>
-      <div class="home-status-ip" id="ip-val">—.—.—.—</div>
+    <!-- Connection Card -->
+    <div class="conn-card fade-up delay-2">
+      <div class="conn-top">
+        <div class="conn-shield-wrap">
+          <svg class="conn-shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="conn-meta">
+          <div class="conn-state" id="home-status-lbl">NOT CONNECTED</div>
+          <div class="conn-detail">
+            <div class="home-status-dot" id="home-status-dot"></div>
+            <span id="ip-val">—.—.—.—</span>
+            <span id="home-conn-timer"></span>
+          </div>
+        </div>
+      </div>
+      <button class="conn-btn" id="home-connect-btn" onclick="toggleConnect()">
+        <span id="home-btn-label">CONNECT</span>
+      </button>
     </div>
 
-    <!-- Server Selector -->
-    <div class="selected-server fade-up delay-3" onclick="navigate('servers')">
-      <div class="flag" id="selected-flag">
-        <img src="https://flagcdn.com/w40/nl.png" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block" id="selected-flag-img" alt="">
+    <!-- Server + Protocol Row -->
+    <div class="home-row fade-up delay-3">
+      <div class="home-server-card" onclick="navigate('servers')">
+        <div class="hs-flag" id="selected-flag">
+          <img id="selected-flag-img" src="https://flagcdn.com/w40/nl.png" width="32" height="22" style="border-radius:3px;object-fit:cover;display:block" alt="">
+        </div>
+        <div class="hs-info">
+          <div class="hs-name" id="selected-server-name">Amsterdam</div>
+          <div class="hs-ping"><div class="ping-dot"></div>42 ms</div>
+        </div>
+        <svg class="hs-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="server-info">
-        <div class="server-name" id="selected-server-name">Netherlands — Amsterdam</div>
-        <div class="server-ping"><div class="ping-dot"></div> 42 ms</div>
-      </div>
-      <div class="server-arrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>
-
-    <!-- Protocol Selector -->
-    <div class="proto-row fade-up delay-3">
-      <div class="proto-row-label">Protocol</div>
-      <div class="proto-pills">
-        <button class="proto-pill active" id="hpill-VLESS"  onclick="setHomeProtocol('VLESS')">VLESS</button>
-        <button class="proto-pill"        id="hpill-VMess"  onclick="setHomeProtocol('VMess')">VMess</button>
-        <button class="proto-pill"        id="hpill-Trojan" onclick="setHomeProtocol('Trojan')">Trojan</button>
+      <div class="home-proto-card">
+        <div class="hpc-label">Protocol</div>
+        <div class="hpc-pills">
+          <button class="hpill active" id="hpill-VLESS"  onclick="setHomeProtocol('VLESS')">VLESS</button>
+          <button class="hpill"        id="hpill-VMess"  onclick="setHomeProtocol('VMess')">VMess</button>
+          <button class="hpill"        id="hpill-Trojan" onclick="setHomeProtocol('Trojan')">Trojan</button>
+        </div>
       </div>
     </div>
 
@@ -2041,7 +2106,7 @@ function toggleConnect() {
     if (btn) btn.classList.add('connecting');
     if (lbl) lbl.textContent = t ? t.connecting : 'Connecting...';
     if (dot) { dot.className = 'home-status-dot going'; }
-    if (stlbl) stlbl.innerHTML = (t ? t.connecting : 'Connecting') + ' <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>';
+    if (stlbl) stlbl.innerHTML = t ? t.connecting : 'CONNECTING...';
 
     setTimeout(() => {
       connecting = false;
@@ -2049,7 +2114,7 @@ function toggleConnect() {
       if (btn) { btn.classList.remove('connecting'); btn.classList.add('connected'); }
       if (lbl) lbl.textContent = t ? t.connected : 'CONNECTED';
       if (dot) dot.className = 'home-status-dot on';
-      if (stlbl) { stlbl.textContent = t ? t.protected : 'Protected'; }
+      if (stlbl) { stlbl.textContent = t ? t.connected : 'CONNECTED'; }
       if (timer_) { timer_.style.display = 'inline'; }
 
       mapSetConnected(true);
@@ -2072,7 +2137,7 @@ function toggleConnect() {
     if (btn) btn.classList.remove('connected');
     if (lbl) lbl.textContent = t ? t.connect : 'CONNECT';
     if (dot) dot.className = 'home-status-dot';
-    if (stlbl) stlbl.textContent = t ? t.disconnected : 'Disconnected';
+    if (stlbl) stlbl.textContent = 'NOT CONNECTED';
     if (timer_) { timer_.style.display = 'none'; timer_.textContent = ''; }
 
     mapSetConnected(false);
