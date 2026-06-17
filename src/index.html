@@ -1267,6 +1267,16 @@
   }
   .map-server-badge.show { opacity:1; }
 
+  /* ── MAP MARKERS ── */
+  .myi { position:relative; width:26px; height:26px; display:flex; align-items:center; justify-content:center; }
+  .myi-d { position:absolute; width:8px; height:8px; border-radius:50%; background:#00D4FF; box-shadow:0 0 8px #00D4FF; z-index:2; flex-shrink:0; }
+  .myi-p { position:absolute; width:26px; height:26px; border-radius:50%; border:2px solid rgba(0,212,255,0.55); animation:myi-pulse 2.4s ease-out infinite; }
+  @keyframes myi-pulse { 0%{transform:scale(0.2);opacity:1} 100%{transform:scale(1);opacity:0} }
+  .mpi { position:relative; width:18px; height:18px; display:flex; align-items:center; justify-content:center; }
+  .mpi-d { width:12px; height:12px; border-radius:50%; background:#6C63FF; border:2.5px solid #fff; box-shadow:0 0 10px rgba(108,99,255,0.7); transition:background 0.4s,box-shadow 0.4s; }
+  /* arc animation */
+  @keyframes arc-dash { to { stroke-dashoffset: -30; } }
+
   /* ── CONNECTION CARD ── */
   .conn-card {
     margin:10px 16px 0;
@@ -1465,9 +1475,8 @@
     <div class="home-proto-card fade-up delay-3">
       <div class="hpc-label">Protocol</div>
       <div class="hpc-pills">
-        <button class="hpill active" id="hpill-VLESS"  onclick="setHomeProtocol('VLESS')">OpenVPN</button>
-        <button class="hpill"        id="hpill-VMess"  onclick="setHomeProtocol('VMess')">WireGuard</button>
-        <button class="hpill"        id="hpill-Trojan" onclick="setHomeProtocol('Trojan')">TCP/UDP</button>
+        <button class="hpill active" id="hpill-VLESS" onclick="setHomeProtocol('VLESS')">OpenVPN-UDP</button>
+        <button class="hpill"        id="hpill-VMess" onclick="setHomeProtocol('VMess')">OpenVPN-TCP</button>
       </div>
     </div>
 
@@ -1750,7 +1759,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="17" height="17"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         </div>
         <div class="profile-item-label" id="pi-protocol">Protocol</div>
-        <div class="profile-item-value" id="pi-protocol-val">OpenVPN</div>
+        <div class="profile-item-value" id="pi-protocol-val">OpenVPN-UDP</div>
         <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
       <div class="profile-item" onclick="toggleNotif()">
@@ -1865,16 +1874,12 @@
       <div class="pmodal-title">Select Protocol</div>
       <div class="pmodal-body">
         <div class="protocol-option" onclick="setProtocol('VLESS',this)">
-          <div><div class="protocol-name">OpenVPN</div><div class="protocol-desc">Fast & lightweight — recommended</div></div>
+          <div><div class="protocol-name">OpenVPN-UDP</div><div class="protocol-desc">Fast & lightweight — recommended</div></div>
           <div class="protocol-check active" id="proto-VLESS"></div>
         </div>
         <div class="protocol-option" onclick="setProtocol('VMess',this)">
-          <div><div class="protocol-name">WireGuard</div><div class="protocol-desc">Encrypted with obfuscation</div></div>
+          <div><div class="protocol-name">OpenVPN-TCP</div><div class="protocol-desc">Reliable — bypasses strict firewalls</div></div>
           <div class="protocol-check" id="proto-VMess"></div>
-        </div>
-        <div class="protocol-option" onclick="setProtocol('Trojan',this)">
-          <div><div class="protocol-name">TCP/UDP</div><div class="protocol-desc">Mimics HTTPS traffic</div></div>
-          <div class="protocol-check" id="proto-Trojan"></div>
         </div>
       </div>
     </div>
@@ -2020,9 +2025,37 @@ const SERVER_LATLNG = {
   'Turkey — Istanbul':       [41.01, 28.97],
   'UAE — Dubai':             [25.20, 55.27],
 };
-const MAP_YOU_LL = [32.43, 53.69]; // Iran
+const MAP_YOU_LL = [32.43, 53.69];
 
-let _map = null, _mapTile = null, _mapPinMarker = null, _mapYouMarker = null, _mapArcLine = null;
+let _map = null, _mapTile = null, _mapPinMarker = null, _mapYouMarker = null;
+let _mapConnected = false, _arcSvg = null, _arcMain = null, _arcShadow = null;
+
+function _makePinIcon(connected) {
+  const c = connected ? '#00E5A0' : '#6C63FF';
+  const s = connected ? '0 0 12px rgba(0,229,160,0.8)' : '0 0 10px rgba(108,99,255,0.7)';
+  return L.divIcon({
+    className: '',
+    html: `<div class="mpi"><span class="mpi-d" style="background:${c};box-shadow:${s}"></span></div>`,
+    iconSize: [18,18], iconAnchor: [9,9]
+  });
+}
+
+function _redrawArc() {
+  if (!_mapConnected || !_arcMain || !_mapPinMarker) return;
+  const p1 = _map.latLngToContainerPoint(MAP_YOU_LL);
+  const p2 = _map.latLngToContainerPoint(_mapPinMarker.getLatLng());
+  const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+  const mx = (p1.x + p2.x) / 2;
+  const my = (p1.y + p2.y) / 2 - Math.max(dist * 0.55, 60);
+  const d = `M${p1.x},${p1.y} Q${mx},${my} ${p2.x},${p2.y}`;
+  const grad = _arcSvg.querySelector('#arcG');
+  if (grad) {
+    grad.setAttribute('x1', p1.x); grad.setAttribute('y1', p1.y);
+    grad.setAttribute('x2', p2.x); grad.setAttribute('y2', p2.y);
+  }
+  _arcMain.setAttribute('d', d);
+  _arcShadow.setAttribute('d', d);
+}
 
 function initMap() {
   if (_map || !window.L) return;
@@ -2033,8 +2066,7 @@ function initMap() {
     center: [25, 18], zoom: 2,
     zoomControl: false, scrollWheelZoom: false,
     doubleClickZoom: false, touchZoom: false,
-    dragging: false, attributionControl: false,
-    keyboard: false,
+    dragging: false, attributionControl: false, keyboard: false,
   });
 
   const tileUrl = isLight
@@ -2042,47 +2074,78 @@ function initMap() {
     : 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';
   _mapTile = L.tileLayer(tileUrl, { subdomains: 'abcd', maxZoom: 5 }).addTo(_map);
 
-  // "You" marker
-  _mapYouMarker = L.circleMarker(MAP_YOU_LL, {
-    radius: 5, color: '#00D4FF', fillColor: '#00D4FF',
-    fillOpacity: 0.85, weight: 2, className: 'map-you-dot'
+  // "You" marker — pulsing cyan dot
+  _mapYouMarker = L.marker(MAP_YOU_LL, {
+    icon: L.divIcon({
+      className: '',
+      html: '<div class="myi"><span class="myi-p"></span><span class="myi-d"></span></div>',
+      iconSize: [26,26], iconAnchor: [13,13]
+    }), zIndexOffset: 10
   }).addTo(_map);
 
   // Server pin
-  _mapPinMarker = L.circleMarker([52.37, 4.90], {
-    radius: 7, color: '#fff', fillColor: '#6C63FF',
-    fillOpacity: 1, weight: 2
+  _mapPinMarker = L.marker([52.37, 4.90], {
+    icon: _makePinIcon(false), zIndexOffset: 20
   }).addTo(_map);
+
+  // SVG arc overlay
+  _arcSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  _arcSvg.setAttribute('style', 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:450;overflow:visible');
+  _arcSvg.innerHTML = `
+    <defs>
+      <linearGradient id="arcG" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#00D4FF" stop-opacity="0.9"/>
+        <stop offset="48%" stop-color="#9C6FFF"/>
+        <stop offset="100%" stop-color="#00E5A0" stop-opacity="0.9"/>
+      </linearGradient>
+      <filter id="arcGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <path id="arc-shadow" fill="none" stroke="rgba(108,99,255,0.15)" stroke-width="8" stroke-linecap="round"/>
+    <path id="arc-main" fill="none" stroke="url(#arcG)" stroke-width="3" stroke-linecap="round"
+          stroke-dasharray="10,6" filter="url(#arcGlow)" opacity="0"/>
+  `;
+  el.appendChild(_arcSvg);
+  _arcMain   = _arcSvg.querySelector('#arc-main');
+  _arcShadow = _arcSvg.querySelector('#arc-shadow');
+
+  _map.on('move zoom', _redrawArc);
 }
 
 function mapSetPin(name) {
-  if (!_map) return;
+  if (!_map || !_mapPinMarker) return;
   const ll = SERVER_LATLNG[name];
-  if (!ll) return;
-  _mapPinMarker.setLatLng(ll);
+  if (ll) _mapPinMarker.setLatLng(ll);
 }
 
 function mapSetConnected(on) {
-  if (_mapPinMarker) {
-    _mapPinMarker.setStyle({ fillColor: on ? '#00E5A0' : '#6C63FF', color: on ? '#00E5A0' : '#fff' });
-  }
-  if (_mapArcLine) { _map.removeLayer(_mapArcLine); _mapArcLine = null; }
-  if (on && _mapPinMarker) {
-    _mapArcLine = L.polyline([MAP_YOU_LL, _mapPinMarker.getLatLng()], {
-      color: '#6C63FF', weight: 2, opacity: 0.75,
-      dashArray: '6,5', dashOffset: '0'
-    }).addTo(_map);
-    // zoom into server location
+  _mapConnected = on;
+  if (_mapPinMarker) _mapPinMarker.setIcon(_makePinIcon(on));
+
+  if (on) {
+    // Show arc after flyTo completes
     const ll = _mapPinMarker.getLatLng();
-    _map.flyTo([ll.lat - 3, ll.lng], 4, { duration: 1.6, easeLinearity: 0.35 });
-  } else if (_map) {
-    // zoom back to world overview
+    _map.flyTo([ll.lat - 2, ll.lng], 4, { duration: 1.6, easeLinearity: 0.35 });
+    _map.once('moveend', () => {
+      if (!_mapConnected) return;
+      _redrawArc();
+      _arcMain.style.opacity = '1';
+      _arcShadow.style.opacity = '0.8';
+      _arcMain.style.animation = 'arc-dash 1.8s linear infinite';
+    });
+  } else {
+    _arcMain.style.opacity = '0';
+    _arcShadow.style.opacity = '0';
+    _arcMain.style.animation = 'none';
     _map.flyTo([25, 18], 2, { duration: 1.2, easeLinearity: 0.4 });
   }
+
   const badge = document.getElementById('map-server-badge');
   if (badge) {
-    const name = document.getElementById('selected-server-name');
-    if (name) badge.textContent = '● ' + name.textContent;
+    const nm = document.getElementById('selected-server-name');
+    if (nm) badge.textContent = '● ' + nm.textContent;
     badge.classList.toggle('show', on);
   }
 }
@@ -2186,10 +2249,10 @@ function selectServer(el, name, ping, flagCode) {
   setTimeout(() => navigate('home'), 300);
 }
 
-const PROTO_LABELS = { VLESS: 'OpenVPN', VMess: 'WireGuard', Trojan: 'TCP/UDP' };
+const PROTO_LABELS = { VLESS: 'OpenVPN-UDP', VMess: 'OpenVPN-TCP' };
 function setHomeProtocol(name) {
   currentProtocol = name;
-  ['VLESS','VMess','Trojan'].forEach(p => {
+  ['VLESS','VMess'].forEach(p => {
     const h = document.getElementById('hpill-' + p);
     if (h) h.classList.toggle('active', p === name);
     const pr = document.getElementById('proto-' + p);
@@ -2686,7 +2749,7 @@ function toggleNotif() {
 
 let currentProtocol = 'VLESS';
 function setProtocol(name) {
-  ['VLESS','VMess','Trojan'].forEach(p => {
+  ['VLESS','VMess'].forEach(p => {
     const el = document.getElementById('proto-' + p);
     if (el) el.classList.toggle('active', p === name);
   });
