@@ -79,16 +79,13 @@
     -webkit-user-select: none;
   }
 
-  html { scrollbar-width: none; }
-  html::-webkit-scrollbar { display: none; }
+  html, body { scrollbar-width: none; }
+  html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Inter', 'Noto Sans SC', sans-serif;
-    scrollbar-width: none;
-    overflow: hidden;
   }
-  body::-webkit-scrollbar { display: none; }
   :lang(fa) body, [dir="rtl"] body, [dir="rtl"] {
     font-family: 'Vazirmatn', 'Inter', sans-serif;
     height: 100vh;
@@ -143,6 +140,8 @@
     padding-top: env(safe-area-inset-top);
   }
   .screen::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
+  *::-webkit-scrollbar { display: none; }
   .screen-content { flex: 1; }
   .screen.active {
     opacity: 1; pointer-events: all;
