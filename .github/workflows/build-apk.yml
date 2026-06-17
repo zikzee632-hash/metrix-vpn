@@ -57,6 +57,8 @@ jobs:
             '    <item name="android:statusBarColor">#07080F</item>\n'
             '    <item name="android:windowLightNavigationBar">false</item>\n'
             '    <item name="android:windowLightStatusBar">false</item>\n'
+            '    <item name="android:enforceNavigationBarContrast">false</item>\n'
+            '    <item name="android:enforceStatusBarContrast">false</item>\n'
           )
           for path in glob.glob('android/app/src/main/res/values*/styles.xml'):
               with open(path) as f: content = f.read()
