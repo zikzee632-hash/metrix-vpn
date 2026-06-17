@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>MetRix VPN</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@700;900&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
+  @import url('fonts/fonts.css');
 
   :root {
     --bg:       #07080F;
@@ -77,7 +76,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
   }
   :lang(fa) body, [dir="rtl"] body, [dir="rtl"] {
     font-family: 'Vazirmatn', 'Inter', sans-serif;
@@ -915,13 +914,13 @@
           <div class="orb-icon" id="orb-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
-          <div class="orb-label" id="orb-label">اتصال</div>
+          <div class="orb-label" id="orb-label">CONNECT</div>
         </button>
       </div>
 
       <div class="conn-status fade-up delay-2">
-        <div class="conn-status-label" id="conn-status-label">قطع شده</div>
-        <div class="conn-status-sub" id="conn-status-sub">برای اتصال لمس کنید</div>
+        <div class="conn-status-label" id="conn-status-label">Disconnected</div>
+        <div class="conn-status-sub" id="conn-status-sub">Tap to connect</div>
         <div class="conn-timer" id="conn-timer" style="display:none">00:00:00</div>
       </div>
     </div>
@@ -981,6 +980,7 @@
 
   <!-- ════════════ SERVERS ════════════ -->
   <div class="screen" id="screen-servers">
+    <div class="screen-content">
     <div class="screen-title fade-up">Select Server</div>
 
     <div class="search-bar fade-up delay-1">
@@ -1047,6 +1047,7 @@
     </div>
 
     <div class="spacer"></div>
+    </div><!-- /screen-content -->
 
     <div class="bottom-nav">
       <button class="nav-item" onclick="navigate('home')">
@@ -1251,7 +1252,7 @@
       <div class="lang-modal-handle"></div>
       <div class="lang-modal-title" data-i18n="selectLang">Select Language</div>
       <div class="lang-option active" id="lang-en" onclick="setLang('en')">
-        <div class="lang-option-flag">🇺🇸</div>
+        <div class="lang-option-flag"><svg viewBox="0 0 36 36" width="24" height="24"><rect width="36" height="36" rx="4" fill="#B22234"/><rect y="3" width="36" height="3.5" fill="#fff"/><rect y="10" width="36" height="3.5" fill="#fff"/><rect y="17" width="36" height="3.5" fill="#fff"/><rect y="24" width="36" height="3.5" fill="#fff"/><rect y="31" width="36" height="3.5" fill="#fff"/><rect width="14" height="19" rx="0" fill="#3C3B6E"/></svg></div>
         <div class="lang-option-info">
           <div class="lang-option-name">English</div>
           <div class="lang-option-native">English</div>
@@ -1259,15 +1260,15 @@
         <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
       </div>
       <div class="lang-option" id="lang-fa" onclick="setLang('fa')">
-        <div class="lang-option-flag">🇮🇷</div>
+        <div class="lang-option-flag"><svg viewBox="0 0 36 36" width="24" height="24"><rect width="36" height="12" fill="#239F40"/><rect y="12" width="36" height="12" fill="#fff"/><rect y="24" width="36" height="12" fill="#DA0000"/></svg></div>
         <div class="lang-option-info">
           <div class="lang-option-name">Persian</div>
-          <div class="lang-option-native">فارسی</div>
+          <div class="lang-option-native" style="font-family:'Vazirmatn',sans-serif">فارسی</div>
         </div>
         <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
       </div>
       <div class="lang-option" id="lang-ar" onclick="setLang('ar')">
-        <div class="lang-option-flag">🇸🇦</div>
+        <div class="lang-option-flag"><svg viewBox="0 0 36 36" width="24" height="24"><rect width="36" height="36" rx="4" fill="#006C35"/><rect y="28" width="36" height="8" fill="#fff"/></svg></div>
         <div class="lang-option-info">
           <div class="lang-option-name">Arabic</div>
           <div class="lang-option-native">العربية</div>
@@ -1275,7 +1276,7 @@
         <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
       </div>
       <div class="lang-option" id="lang-ru" onclick="setLang('ru')">
-        <div class="lang-option-flag">🇷🇺</div>
+        <div class="lang-option-flag"><svg viewBox="0 0 36 36" width="24" height="24"><rect width="36" height="12" fill="#fff"/><rect y="12" width="36" height="12" fill="#0039A6"/><rect y="24" width="36" height="12" fill="#D52B1E"/></svg></div>
         <div class="lang-option-info">
           <div class="lang-option-name">Russian</div>
           <div class="lang-option-native">Русский</div>
@@ -1283,7 +1284,7 @@
         <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
       </div>
       <div class="lang-option" id="lang-tr" onclick="setLang('tr')">
-        <div class="lang-option-flag">🇹🇷</div>
+        <div class="lang-option-flag"><svg viewBox="0 0 36 36" width="24" height="24"><rect width="36" height="36" rx="4" fill="#E30A17"/><circle cx="13" cy="18" r="7" fill="#fff"/><circle cx="16" cy="18" r="5.5" fill="#E30A17"/></svg></div>
         <div class="lang-option-info">
           <div class="lang-option-name">Turkish</div>
           <div class="lang-option-native">Türkçe</div>
@@ -1291,7 +1292,7 @@
         <div class="lang-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
       </div>
       <div class="lang-option" id="lang-zh" onclick="setLang('zh')">
-        <div class="lang-option-flag">🇨🇳</div>
+        <div class="lang-option-flag"><svg viewBox="0 0 36 36" width="24" height="24"><rect width="36" height="36" rx="4" fill="#DE2910"/><polygon points="6,4 7.5,8.5 12,8.5 8.5,11 10,15.5 6,13 2,15.5 3.5,11 0,8.5 4.5,8.5" fill="#FFDE00"/></svg></div>
         <div class="lang-option-info">
           <div class="lang-option-name">Chinese</div>
           <div class="lang-option-native">中文</div>
@@ -1831,8 +1832,8 @@ function setLang(code) {
   }, 280);
 }
 
-// init Persian on load
-applyLang('fa');
+// init English on load
+applyLang('en');
 
 </script>
 
