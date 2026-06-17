@@ -159,19 +159,25 @@
   .status-icons { display: none; }
 
   /* ── BOTTOM NAV ── */
-  /* ── BOTTOM NAV ── */
+  .bottom-nav-wrap {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 25;
+    padding: 0 12px calc(14px + env(safe-area-inset-bottom));
+    padding-top: 8px;
+    pointer-events: none;
+  }
   .bottom-nav {
-    position: sticky;
-    bottom: 0;
-    background: var(--nav-bg);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
-    padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
-    z-index: 20;
-    gap: 4px;
+    background: rgba(11,12,24,0.88);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.07);
+    padding: 4px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(108,99,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04);
+    pointer-events: all;
   }
   .nav-item {
     flex: 1;
@@ -184,24 +190,36 @@
     border: none;
     background: none;
     color: var(--muted);
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 600;
+    letter-spacing: 0.3px;
     font-family: inherit;
-    padding: 8px 4px;
-    border-radius: 14px;
-    transition: color 0.2s, background 0.2s;
+    padding: 9px 4px 8px;
+    border-radius: 22px;
+    transition: color 0.22s, background 0.22s, transform 0.15s;
     position: relative;
+    -webkit-tap-highlight-color: transparent;
   }
-  .nav-item svg { width: 22px; height: 22px; transition: transform 0.25s cubic-bezier(.4,0,.2,1); }
-  .nav-item.active {
-    color: var(--accent);
-    background: rgba(108,99,255,0.1);
+  .nav-item svg {
+    width: 22px; height: 22px;
+    transition: transform 0.32s cubic-bezier(.34,1.56,.64,1), filter 0.25s;
   }
+  .nav-item.active { color: var(--accent); background: rgba(108,99,255,0.13); }
   .nav-item.active svg {
-    transform: translateY(-1px) scale(1.08);
-    filter: drop-shadow(0 0 5px rgba(108,99,255,0.5));
+    transform: scale(1.18) translateY(-1px);
+    filter: drop-shadow(0 0 7px rgba(108,99,255,0.55));
   }
-  .nav-item:active { transform: scale(0.93); }
+  .nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .nav-item:active { transform: scale(0.86); }
+  .screen-content { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
 
   /* ── PROFILE MODALS ── */
   .pmodal-overlay {
@@ -1318,24 +1336,6 @@
     </div>
 
     </div><!-- /screen-content -->
-    <div class="bottom-nav">
-      <button class="nav-item active" onclick="navigate('home')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Home
-      </button>
-      <button class="nav-item" onclick="navigate('servers')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-        Servers
-      </button>
-      <button class="nav-item" onclick="navigate('plans')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        Plans
-      </button>
-      <button class="nav-item" onclick="navigate('profile')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Profile
-      </button>
-    </div>
   </div>
 
   <!-- ════════════ SERVERS ════════════ -->
@@ -1413,25 +1413,6 @@
 
     <div class="spacer"></div>
     </div><!-- /screen-content -->
-
-    <div class="bottom-nav">
-      <button class="nav-item" onclick="navigate('home')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Home
-      </button>
-      <button class="nav-item active" onclick="navigate('servers')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-        Servers
-      </button>
-      <button class="nav-item" onclick="navigate('plans')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        Plans
-      </button>
-      <button class="nav-item" onclick="navigate('profile')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Profile
-      </button>
-    </div>
   </div>
 
   <!-- ════════════ PLANS ════════════ -->
@@ -1515,25 +1496,6 @@
     </div>
     <div style="height:16px"></div>
     </div><!-- /screen-content -->
-
-    <div class="bottom-nav">
-      <button class="nav-item" onclick="navigate('home')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Home
-      </button>
-      <button class="nav-item" onclick="navigate('servers')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
-        Servers
-      </button>
-      <button class="nav-item active" onclick="navigate('plans')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        Plans
-      </button>
-      <button class="nav-item" onclick="navigate('profile')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Profile
-      </button>
-    </div>
   </div>
 
   <!-- ════════════ PROFILE ════════════ -->
@@ -1664,27 +1626,29 @@
 
     <div style="height:8px"></div>
     </div><!-- /screen-content -->
+  </div>
 
-    <div class="bottom-nav">
-      <button class="nav-item" onclick="navigate('home')">
+  <!-- ════════════ GLOBAL BOTTOM NAV ════════════ -->
+  <div class="bottom-nav-wrap">
+    <div class="bottom-nav" id="main-nav">
+      <button class="nav-item active" id="nav-home" onclick="navigate('home')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Home
       </button>
-      <button class="nav-item" onclick="navigate('servers')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
+      <button class="nav-item" id="nav-servers" onclick="navigate('servers')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         Servers
       </button>
-      <button class="nav-item" onclick="navigate('plans')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <button class="nav-item" id="nav-plans" onclick="navigate('plans')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="6 3 2 9 12 22 22 9 18 3 6 3"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="12" y1="3" x2="12" y2="22"/></svg>
         Plans
       </button>
-      <button class="nav-item active" onclick="navigate('profile')">
+      <button class="nav-item" id="nav-profile" onclick="navigate('profile')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         Profile
       </button>
     </div>
   </div>
-
 
   <!-- ════════════ PROFILE MODALS ════════════ -->
 
@@ -1871,8 +1835,12 @@ function navigate(page) {
       target.scrollTop = 0;
     });
   }
+  // update nav active state
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const navBtn = document.getElementById('nav-' + page);
+  if (navBtn) navBtn.classList.add('active');
   // re-trigger fade-up
-  document.querySelectorAll('#screen-' + page + ' .fade-up').forEach((el, i) => {
+  document.querySelectorAll('#screen-' + page + ' .fade-up').forEach(el => {
     el.style.animation = 'none';
     void el.offsetWidth;
     el.style.animation = '';
