@@ -3202,23 +3202,6 @@ function initProfileFromStorage() {
     localStorage.setItem('mx_provider', 'email');
     doLogin();
   };
-  // backdoor: tap logo 5x fast
-  let _tapCount = 0, _tapTimer = null;
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('#login-logo-tap')) {
-      _tapCount++;
-      clearTimeout(_tapTimer);
-      if (_tapCount >= 5) {
-        _tapCount = 0;
-        localStorage.setItem(STORAGE_KEY, '1');
-        localStorage.setItem('mx_name', 'Admin');
-        localStorage.setItem('mx_email', 'admin@metrix.vpn');
-        doLogin();
-      }
-      _tapTimer = setTimeout(() => _tapCount = 0, 800);
-    }
-  });
-
   function doLogin() {
     localStorage.setItem(STORAGE_KEY, '1');
     const ls = document.getElementById('login-screen');
@@ -3232,6 +3215,31 @@ function initProfileFromStorage() {
       if (ambient) ambient.style.opacity = '';
     }, 50);
   }
+})();
+
+
+// ── Backdoor: tap logo 5x ──
+(function() {
+  let _tapCount = 0, _tapTimer = null;
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#login-logo-tap')) return;
+    _tapCount++;
+    clearTimeout(_tapTimer);
+    if (_tapCount >= 5) {
+      _tapCount = 0;
+      localStorage.setItem('mx_logged_in', '1');
+      localStorage.setItem('mx_name', 'Admin');
+      localStorage.setItem('mx_email', 'admin@metrix.vpn');
+      const ls = document.getElementById('login-screen');
+      const shell = document.querySelector('.phone-shell');
+      const ambient = document.querySelector('.ambient');
+      if (ls) ls.classList.add('hidden');
+      if (shell) { shell.style.transition='opacity 0.4s ease'; setTimeout(()=>shell.style.opacity='',50); }
+      if (ambient) { ambient.style.transition='opacity 0.4s ease'; setTimeout(()=>ambient.style.opacity='',50); }
+      if (typeof initProfileFromStorage === 'function') initProfileFromStorage();
+    }
+    _tapTimer = setTimeout(() => _tapCount = 0, 1200);
+  });
 })();
 
 </body>
