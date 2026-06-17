@@ -1469,9 +1469,9 @@
     <div class="home-proto-card fade-up delay-3">
       <div class="hpc-label">Protocol</div>
       <div class="hpc-pills">
-        <button class="hpill active" id="hpill-VLESS"  onclick="setHomeProtocol('VLESS')">VLESS</button>
-        <button class="hpill"        id="hpill-VMess"  onclick="setHomeProtocol('VMess')">VMess</button>
-        <button class="hpill"        id="hpill-Trojan" onclick="setHomeProtocol('Trojan')">Trojan</button>
+        <button class="hpill active" id="hpill-VLESS"  onclick="setHomeProtocol('VLESS')">OpenVPN</button>
+        <button class="hpill"        id="hpill-VMess"  onclick="setHomeProtocol('VMess')">WireGuard</button>
+        <button class="hpill"        id="hpill-Trojan" onclick="setHomeProtocol('Trojan')">TCP/UDP</button>
       </div>
     </div>
 
@@ -1754,7 +1754,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="17" height="17"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         </div>
         <div class="profile-item-label" id="pi-protocol">Protocol</div>
-        <div class="profile-item-value" id="pi-protocol-val">VLESS</div>
+        <div class="profile-item-value" id="pi-protocol-val">OpenVPN</div>
         <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
       <div class="profile-item" onclick="toggleNotif()">
@@ -1869,15 +1869,15 @@
       <div class="pmodal-title">Select Protocol</div>
       <div class="pmodal-body">
         <div class="protocol-option" onclick="setProtocol('VLESS',this)">
-          <div><div class="protocol-name">VLESS</div><div class="protocol-desc">Fast & lightweight — recommended</div></div>
+          <div><div class="protocol-name">OpenVPN</div><div class="protocol-desc">Fast & lightweight — recommended</div></div>
           <div class="protocol-check active" id="proto-VLESS"></div>
         </div>
         <div class="protocol-option" onclick="setProtocol('VMess',this)">
-          <div><div class="protocol-name">VMess</div><div class="protocol-desc">Encrypted with obfuscation</div></div>
+          <div><div class="protocol-name">WireGuard</div><div class="protocol-desc">Encrypted with obfuscation</div></div>
           <div class="protocol-check" id="proto-VMess"></div>
         </div>
         <div class="protocol-option" onclick="setProtocol('Trojan',this)">
-          <div><div class="protocol-name">Trojan</div><div class="protocol-desc">Mimics HTTPS traffic</div></div>
+          <div><div class="protocol-name">TCP/UDP</div><div class="protocol-desc">Mimics HTTPS traffic</div></div>
           <div class="protocol-check" id="proto-Trojan"></div>
         </div>
       </div>
@@ -2188,6 +2188,7 @@ function selectServer(el, name, ping, flagCode) {
   setTimeout(() => navigate('home'), 300);
 }
 
+const PROTO_LABELS = { VLESS: 'OpenVPN', VMess: 'WireGuard', Trojan: 'TCP/UDP' };
 function setHomeProtocol(name) {
   currentProtocol = name;
   ['VLESS','VMess','Trojan'].forEach(p => {
@@ -2197,7 +2198,7 @@ function setHomeProtocol(name) {
     if (pr) pr.classList.toggle('active', p === name);
   });
   const v = document.getElementById('pi-protocol-val');
-  if (v) v.textContent = name;
+  if (v) v.textContent = PROTO_LABELS[name] || name;
 }
 
 // ── Theme Toggle ──
