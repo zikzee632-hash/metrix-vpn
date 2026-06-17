@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>MetRix VPN</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
 
   :root {
     --bg:       #07080F;
@@ -77,6 +78,9 @@
     background: var(--bg);
     color: var(--text);
     font-family: 'Inter', sans-serif;
+  }
+  :lang(fa) body, [dir="rtl"] body, [dir="rtl"] {
+    font-family: 'Vazirmatn', 'Inter', sans-serif;
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
@@ -1846,8 +1850,8 @@ function setLang(code) {
   }, 280);
 }
 
-// init English on load
-applyLang('en');
+// init Persian on load
+applyLang('fa');
 
 </script>
 
