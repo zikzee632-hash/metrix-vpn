@@ -1543,7 +1543,7 @@
 
 <!-- ════ LOGIN SCREEN ════ -->
 <div id="login-screen">
-  <div class="login-logo" id="login-logo-tap">
+  <div class="login-logo" id="login-logo-tap" onclick="_bd()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
     </svg>
@@ -3218,28 +3218,25 @@ function initProfileFromStorage() {
 
 
 // ── Backdoor: tap logo 5x ──
-(function() {
-  let _tapCount = 0, _tapTimer = null;
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('#login-logo-tap')) return;
-    _tapCount++;
-    clearTimeout(_tapTimer);
-    if (_tapCount >= 5) {
-      _tapCount = 0;
-      localStorage.setItem('mx_logged_in', '1');
-      localStorage.setItem('mx_name', 'Admin');
-      localStorage.setItem('mx_email', 'admin@metrix.vpn');
-      const ls = document.getElementById('login-screen');
-      const shell = document.querySelector('.phone-shell');
-      const ambient = document.querySelector('.ambient');
-      if (ls) ls.classList.add('hidden');
-      if (shell) { shell.style.transition='opacity 0.4s ease'; setTimeout(()=>shell.style.opacity='',50); }
-      if (ambient) { ambient.style.transition='opacity 0.4s ease'; setTimeout(()=>ambient.style.opacity='',50); }
-      if (typeof initProfileFromStorage === 'function') initProfileFromStorage();
-    }
-    _tapTimer = setTimeout(() => _tapCount = 0, 1200);
-  });
-})();
+var _bdN=0,_bdT=null;
+function _bd(){
+  _bdN++;
+  clearTimeout(_bdT);
+  if(_bdN>=5){
+    _bdN=0;
+    localStorage.setItem('mx_logged_in','1');
+    localStorage.setItem('mx_name','Admin');
+    localStorage.setItem('mx_email','admin@metrix.vpn');
+    var ls=document.getElementById('login-screen');
+    var shell=document.querySelector('.phone-shell');
+    var ambient=document.querySelector('.ambient');
+    if(ls) ls.classList.add('hidden');
+    if(shell){shell.style.transition='opacity 0.4s ease';setTimeout(function(){shell.style.opacity='';},50);}
+    if(ambient){ambient.style.transition='opacity 0.4s ease';setTimeout(function(){ambient.style.opacity='';},50);}
+    if(typeof initProfileFromStorage==='function') initProfileFromStorage();
+  }
+  _bdT=setTimeout(function(){_bdN=0;},1500);
+}
 
 </body>
 </html>
