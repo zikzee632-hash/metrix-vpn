@@ -71,7 +71,13 @@
   .theme-toggle svg { width:16px; height:16px; transition: all 0.3s; }
   .theme-toggle.light-active svg { transform: rotate(20deg); }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+  * {
+    margin:0; padding:0; box-sizing:border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
 
   body {
     background: var(--bg);
