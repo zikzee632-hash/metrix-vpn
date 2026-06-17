@@ -1246,7 +1246,8 @@
     box-shadow: 0 4px 32px rgba(0,0,0,0.5);
     flex-shrink: 0;
   }
-  #leaflet-map { width:100%; height:100%; }
+  #leaflet-map { width:100%; height:100%; filter:brightness(1.7) saturate(0.75); }
+  :root.light #leaflet-map { filter:none; }
   .leaflet-control-attribution { display:none !important; }
   .map-fade-top {
     position:absolute; top:0; left:0; right:0; height:48px;
@@ -1346,14 +1347,11 @@
   }
   .conn-btn:active { transform:scale(0.97); }
 
-  /* ── HOME BOTTOM ROW ── */
-  .home-row {
-    display:grid; grid-template-columns:1fr 1fr;
-    gap:10px; padding:10px 16px 0;
-  }
+  /* ── HOME SERVER + PROTOCOL ── */
   .home-server-card {
+    margin:10px 16px 0;
     background:var(--card); border:1px solid var(--border); border-radius:18px;
-    padding:13px 14px; display:flex; align-items:center; gap:10px;
+    padding:14px 16px; display:flex; align-items:center; gap:14px;
     cursor:pointer; transition:border-color 0.2s,transform 0.15s;
     -webkit-tap-highlight-color:transparent; overflow:hidden; position:relative;
   }
@@ -1362,27 +1360,28 @@
     background:linear-gradient(135deg,rgba(108,99,255,0.04),transparent);
     pointer-events:none;
   }
-  .home-server-card:active { transform:scale(0.97); }
-  .home-server-card:hover { border-color:rgba(108,99,255,0.3); }
+  .home-server-card:active { transform:scale(0.98); }
+  .home-server-card:hover { border-color:rgba(108,99,255,0.28); }
   .hs-flag { flex-shrink:0; }
   .hs-flag img { border-radius:3px; object-fit:cover; display:block; }
   .hs-info { flex:1; min-width:0; }
   .hs-name {
-    font-size:12px; font-weight:700;
+    font-size:14px; font-weight:700;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
-  .hs-ping { font-size:10px; color:var(--green); margin-top:3px; display:flex; align-items:center; gap:3px; }
+  .hs-ping { font-size:12px; color:var(--green); margin-top:3px; display:flex; align-items:center; gap:5px; }
   .hs-arrow { color:var(--muted); flex-shrink:0; }
 
   .home-proto-card {
+    margin:10px 16px 0;
     background:var(--card); border:1px solid var(--border); border-radius:18px;
-    padding:13px 14px; display:flex; flex-direction:column; gap:7px;
+    padding:12px 16px; display:flex; align-items:center; gap:12px;
   }
   .hpc-label {
     font-size:9px; font-weight:700; letter-spacing:0.9px;
-    text-transform:uppercase; color:var(--muted);
+    text-transform:uppercase; color:var(--muted); white-space:nowrap; flex-shrink:0;
   }
-  .hpc-pills { display:flex; gap:5px; }
+  .hpc-pills { display:flex; gap:5px; flex:1; }
   .hpill {
     flex:1; padding:6px 0; border-radius:9px;
     border:1px solid var(--border); background:var(--surface);
@@ -1454,24 +1453,25 @@
     </div>
 
     <!-- Server + Protocol Row -->
-    <div class="home-row fade-up delay-3">
-      <div class="home-server-card" onclick="navigate('servers')">
-        <div class="hs-flag" id="selected-flag">
-          <img id="selected-flag-img" src="https://flagcdn.com/w40/nl.png" width="32" height="22" style="border-radius:3px;object-fit:cover;display:block" alt="">
-        </div>
-        <div class="hs-info">
-          <div class="hs-name" id="selected-server-name">Amsterdam</div>
-          <div class="hs-ping"><div class="ping-dot"></div>42 ms</div>
-        </div>
-        <svg class="hs-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="9 18 15 12 9 6"/></svg>
+    <!-- Server Card (full width) -->
+    <div class="home-server-card fade-up delay-3" onclick="navigate('servers')">
+      <div class="hs-flag" id="selected-flag">
+        <img id="selected-flag-img" src="https://flagcdn.com/w40/nl.png" width="36" height="24" style="border-radius:3px;object-fit:cover;display:block" alt="">
       </div>
-      <div class="home-proto-card">
-        <div class="hpc-label">Protocol</div>
-        <div class="hpc-pills">
-          <button class="hpill active" id="hpill-VLESS"  onclick="setHomeProtocol('VLESS')">VLESS</button>
-          <button class="hpill"        id="hpill-VMess"  onclick="setHomeProtocol('VMess')">VMess</button>
-          <button class="hpill"        id="hpill-Trojan" onclick="setHomeProtocol('Trojan')">Trojan</button>
-        </div>
+      <div class="hs-info">
+        <div class="hs-name" id="selected-server-name">Netherlands — Amsterdam</div>
+        <div class="hs-ping"><div class="ping-dot"></div>42 ms</div>
+      </div>
+      <svg class="hs-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <!-- Protocol Row -->
+    <div class="home-proto-card fade-up delay-3">
+      <div class="hpc-label">Protocol</div>
+      <div class="hpc-pills">
+        <button class="hpill active" id="hpill-VLESS"  onclick="setHomeProtocol('VLESS')">VLESS</button>
+        <button class="hpill"        id="hpill-VMess"  onclick="setHomeProtocol('VMess')">VMess</button>
+        <button class="hpill"        id="hpill-Trojan" onclick="setHomeProtocol('Trojan')">Trojan</button>
       </div>
     </div>
 
