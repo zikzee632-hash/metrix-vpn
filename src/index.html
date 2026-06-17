@@ -140,8 +140,10 @@
     padding-top: env(safe-area-inset-top);
   }
   .screen::-webkit-scrollbar { display: none; }
-  * { scrollbar-width: none; }
-  *::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+  *::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; background: transparent !important; }
+  *::-webkit-scrollbar-thumb { background: transparent !important; }
+  *::-webkit-scrollbar-track { background: transparent !important; }
   .screen-content { flex: 1; }
   .screen.active {
     opacity: 1; pointer-events: all;
@@ -1543,7 +1545,7 @@
 
 <!-- ════ LOGIN SCREEN ════ -->
 <div id="login-screen">
-  <div class="login-logo" id="login-logo-tap" onclick="_bd()">
+  <div class="login-logo" id="login-logo-tap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
     </svg>
@@ -3190,6 +3192,11 @@ function initProfileFromStorage() {
   };
   window.loginWithEmail = function() {
     const email = document.getElementById('login-email').value.trim();
+    if (email === '0000') {
+      localStorage.setItem('mx_name', 'Admin');
+      localStorage.setItem('mx_email', 'admin@metrix.vpn');
+      doLogin(); return;
+    }
     if (!email || !email.includes('@')) {
       document.getElementById('login-email').style.borderColor = 'var(--red)';
       setTimeout(() => document.getElementById('login-email').style.borderColor = '', 1200);
@@ -3217,26 +3224,27 @@ function initProfileFromStorage() {
 })();
 
 
-// ── Backdoor: tap logo 5x ──
-var _bdN=0,_bdT=null;
+// ── Backdoor: type 0000 in email field ──
 function _bd(){
-  _bdN++;
-  clearTimeout(_bdT);
-  if(_bdN>=5){
-    _bdN=0;
-    localStorage.setItem('mx_logged_in','1');
-    localStorage.setItem('mx_name','Admin');
-    localStorage.setItem('mx_email','admin@metrix.vpn');
-    var ls=document.getElementById('login-screen');
-    var shell=document.querySelector('.phone-shell');
-    var ambient=document.querySelector('.ambient');
-    if(ls) ls.classList.add('hidden');
-    if(shell){shell.style.transition='opacity 0.4s ease';setTimeout(function(){shell.style.opacity='';},50);}
-    if(ambient){ambient.style.transition='opacity 0.4s ease';setTimeout(function(){ambient.style.opacity='';},50);}
-    if(typeof initProfileFromStorage==='function') initProfileFromStorage();
-  }
-  _bdT=setTimeout(function(){_bdN=0;},1500);
+  var el=document.getElementById('login-email');
+  if(!el) return;
+  el.addEventListener('keydown',function(e){
+    if(e.key==='Enter' && el.value==='0000'){
+      e.preventDefault();
+      localStorage.setItem('mx_logged_in','1');
+      localStorage.setItem('mx_name','Admin');
+      localStorage.setItem('mx_email','admin@metrix.vpn');
+      var ls=document.getElementById('login-screen');
+      var shell=document.querySelector('.phone-shell');
+      var ambient=document.querySelector('.ambient');
+      if(ls) ls.classList.add('hidden');
+      if(shell){shell.style.transition='opacity 0.4s ease';setTimeout(function(){shell.style.opacity='';},50);}
+      if(ambient){ambient.style.transition='opacity 0.4s ease';setTimeout(function(){ambient.style.opacity='';},50);}
+      if(typeof initProfileFromStorage==='function') initProfileFromStorage();
+    }
+  });
 }
+document.addEventListener('DOMContentLoaded', _bd);
 
 </body>
 </html>
