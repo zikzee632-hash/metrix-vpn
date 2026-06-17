@@ -1994,7 +1994,7 @@
         <input class="pmodal-input" type="password" placeholder="Current password">
         <input class="pmodal-input" type="password" placeholder="New password">
         <input class="pmodal-input" type="password" placeholder="Confirm new password">
-        <button class="pmodal-btn" onclick="closePModal('password')">Save Password</button>
+        <button class="pmodal-btn" onclick="savePassword()">Save Password</button>
         <button class="pmodal-btn-outline" onclick="closePModal('password')">Cancel</button>
       </div>
     </div>
@@ -2056,7 +2056,7 @@
         </div>
         <div class="signout-confirm-title">Sign Out?</div>
         <div class="signout-confirm-sub">You'll need to sign in again to use MetRix VPN.</div>
-        <button class="pmodal-btn-danger" onclick="closePModal('signout')">Yes, Sign Out</button>
+        <button class="pmodal-btn-danger" onclick="doSignOut()">Yes, Sign Out</button>
         <button class="pmodal-btn-outline" onclick="closePModal('signout')">Cancel</button>
       </div>
     </div>
@@ -2644,6 +2644,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (active) movePill(active);
   fetchPublicIP();
   renderServers();
+  initProfileFromStorage();
 });
 
 // ── IP Chip ──
@@ -3033,6 +3034,9 @@ function toggleNotif() {
   const on = knob.style.left === '18px';
   knob.style.left = on ? '2px' : '18px';
   toggle.style.background = on ? 'var(--border)' : 'var(--green)';
+  const notifVal = document.getElementById('pi-notif-val');
+  if (notifVal) notifVal.textContent = on ? 'Disabled' : 'Enabled';
+  localStorage.setItem('mx_notif', on ? '0' : '1');
 }
 
 let currentProtocol = 'VLESS';
@@ -3042,6 +3046,84 @@ function setProtocol(name) {
     if (el) el.classList.toggle('active', p === name);
   });
   currentProtocol = name;
+  localStorage.setItem('mx_protocol', name);
+  const label = { VLESS: 'OpenVPN-UDP', VMess: 'OpenVPN-TCP', Trojan: 'WireGuard' };
+  const pval = document.getElementById('pi-protocol-val');
+  if (pval) pval.textContent = label[name] || name;
+  setHomeProtocol(label[name] || name);
+  closePModal('protocol');
+}
+
+function doSignOut() {
+  ['mx_logged_in','mx_name','mx_email','mx_provider'].forEach(k => localStorage.removeItem(k));
+  closePModal('signout');
+  setTimeout(() => {
+    const ls = document.getElementById('login-screen');
+    const shell = document.querySelector('.phone-shell');
+    const ambient = document.querySelector('.ambient');
+    if (shell) { shell.style.transition='none'; shell.style.opacity='0'; }
+    if (ambient) { ambient.style.transition='none'; ambient.style.opacity='0'; }
+    if (ls) { ls.style.transition='none'; ls.classList.remove('hidden'); }
+    const emailInput = document.getElementById('login-email');
+    if (emailInput) emailInput.value = '';
+  }, 300);
+}
+
+function savePassword() {
+  const inputs = document.querySelectorAll('#pm-password .pmodal-input');
+  const cur = inputs[0]?.value || '';
+  const nw = inputs[1]?.value || '';
+  const cf = inputs[2]?.value || '';
+  const stored = localStorage.getItem('mx_password') || '';
+  if (stored && cur !== stored) {
+    inputs[0].style.borderColor = 'var(--red)';
+    setTimeout(() => inputs[0].style.borderColor = '', 1500);
+    return;
+  }
+  if (nw.length < 6) {
+    inputs[1].style.borderColor = 'var(--red)';
+    setTimeout(() => inputs[1].style.borderColor = '', 1500);
+    return;
+  }
+  if (nw !== cf) {
+    inputs[2].style.borderColor = 'var(--red)';
+    setTimeout(() => inputs[2].style.borderColor = '', 1500);
+    return;
+  }
+  localStorage.setItem('mx_password', nw);
+  inputs.forEach(i => { i.value = ''; i.style.borderColor = 'var(--green)'; });
+  setTimeout(() => { inputs.forEach(i => i.style.borderColor = ''); closePModal('password'); }, 900);
+}
+
+function initProfileFromStorage() {
+  const name = localStorage.getItem('mx_name') || 'Michael';
+  const email = localStorage.getItem('mx_email') || 'michael@metrix.vpn';
+  const nameEl = document.querySelector('.profile-name');
+  const emailEl = document.querySelector('.profile-email');
+  const avatarEl = document.querySelector('.profile-avatar');
+  if (nameEl) nameEl.textContent = name;
+  if (emailEl) emailEl.textContent = email;
+  if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase();
+
+  // Restore notifications
+  const notifOn = localStorage.getItem('mx_notif') !== '0';
+  const toggle = document.getElementById('notif-toggle');
+  const knob = document.getElementById('notif-knob');
+  const notifVal = document.getElementById('pi-notif-val');
+  if (toggle) toggle.style.background = notifOn ? 'var(--green)' : 'var(--border)';
+  if (knob) knob.style.left = notifOn ? '18px' : '2px';
+  if (notifVal) notifVal.textContent = notifOn ? 'Enabled' : 'Disabled';
+
+  // Restore protocol
+  const proto = localStorage.getItem('mx_protocol') || 'VLESS';
+  const label = { VLESS: 'OpenVPN-UDP', VMess: 'OpenVPN-TCP', Trojan: 'WireGuard' };
+  currentProtocol = proto;
+  ['VLESS','VMess','Trojan'].forEach(p => {
+    const el = document.getElementById('proto-' + p);
+    if (el) el.classList.toggle('active', p === proto);
+  });
+  const pval = document.getElementById('pi-protocol-val');
+  if (pval) pval.textContent = label[proto] || proto;
 }
 
 </script>
@@ -3094,7 +3176,10 @@ function setProtocol(name) {
   if (ambient) ambient.style.opacity = '0';
 
   window.loginWith = function(provider) {
-    // In a real app, trigger OAuth flow here
+    localStorage.setItem('mx_provider', provider);
+    const names = { google:'Google User', x:'X User', facebook:'Facebook User' };
+    if (!localStorage.getItem('mx_name')) localStorage.setItem('mx_name', names[provider] || 'User');
+    if (!localStorage.getItem('mx_email')) localStorage.setItem('mx_email', provider + '@metrix.vpn');
     doLogin();
   };
   window.loginWithEmail = function() {
@@ -3104,6 +3189,10 @@ function setProtocol(name) {
       setTimeout(() => document.getElementById('login-email').style.borderColor = '', 1200);
       return;
     }
+    localStorage.setItem('mx_email', email);
+    const name = email.split('@')[0].replace(/[^a-zA-Z]/g,' ').trim().split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ') || 'User';
+    localStorage.setItem('mx_name', name);
+    localStorage.setItem('mx_provider', 'email');
     doLogin();
   };
   function doLogin() {
