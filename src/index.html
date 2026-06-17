@@ -77,8 +77,8 @@
     background: var(--bg);
     color: var(--text);
     font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     transition: background 0.35s, color 0.35s;
     /* prevent pull-to-refresh on Android */
@@ -106,8 +106,8 @@
   /* ── FULL SCREEN SHELL ── */
   .phone-shell {
     width: 100vw;
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
     margin: 0;
     background: var(--bg);
     border-radius: 0;
@@ -115,12 +115,13 @@
     box-shadow: none;
     overflow: hidden;
     position: relative;
+    padding-top: env(safe-area-inset-top);
   }
 
   /* ── SCREENS ── */
   .screen {
     position: absolute;
-    inset: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     overflow-y: auto;
     overflow-x: hidden;
     opacity: 0;
@@ -144,22 +145,8 @@
   }
 
   /* ── STATUS BAR ── */
-  .status-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 24px 0;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
-    transition: background 0.35s;
-  }
-  .status-icons { display:flex; gap:6px; align-items:center; }
-  .status-icons svg { width:16px; height:16px; }
+  .status-bar { display: none; }
+  .status-icons { display: none; }
 
   /* ── BOTTOM NAV ── */
   .bottom-nav {
