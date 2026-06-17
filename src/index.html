@@ -135,6 +135,7 @@
     scrollbar-width: none;
     display: flex;
     flex-direction: column;
+    padding-top: env(safe-area-inset-top);
   }
   .screen::-webkit-scrollbar { display: none; }
   /* push nav to bottom on short content */
@@ -875,15 +876,6 @@
   <!-- ════════════ HOME ════════════ -->
   <div class="screen active" id="screen-home">
     <div class="screen-content">
-    <div class="status-bar">
-      <span>9:41</span>
-      <div class="status-icons">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.56 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
-        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="1" y="6" width="4" height="12" rx="1"/><rect x="7" y="4" width="4" height="14" rx="1"/><rect x="13" y="2" width="4" height="16" rx="1"/><rect x="19" y="0" width="4" height="18" rx="1" opacity="0.3"/></svg>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg>
-      </div>
-    </div>
-
     <div class="home-header fade-up">
       <div class="logo">MetRix VPN</div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -923,13 +915,13 @@
           <div class="orb-icon" id="orb-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
-          <div class="orb-label" id="orb-label">CONNECT</div>
+          <div class="orb-label" id="orb-label">اتصال</div>
         </button>
       </div>
 
       <div class="conn-status fade-up delay-2">
-        <div class="conn-status-label" id="conn-status-label">Disconnected</div>
-        <div class="conn-status-sub" id="conn-status-sub">Tap to connect</div>
+        <div class="conn-status-label" id="conn-status-label">قطع شده</div>
+        <div class="conn-status-sub" id="conn-status-sub">برای اتصال لمس کنید</div>
         <div class="conn-timer" id="conn-timer" style="display:none">00:00:00</div>
       </div>
     </div>
@@ -989,13 +981,6 @@
 
   <!-- ════════════ SERVERS ════════════ -->
   <div class="screen" id="screen-servers">
-    <div class="status-bar">
-      <span>9:41</span>
-      <div class="status-icons">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><rect x="1" y="6" width="4" height="12" rx="1"/><rect x="7" y="4" width="4" height="14" rx="1"/><rect x="13" y="2" width="4" height="16" rx="1"/></svg>
-      </div>
-    </div>
-
     <div class="screen-title fade-up">Select Server</div>
 
     <div class="search-bar fade-up delay-1">
@@ -1085,8 +1070,6 @@
 
   <!-- ════════════ PLANS ════════════ -->
   <div class="screen" id="screen-plans">
-    <div class="status-bar"><span>9:41</span></div>
-
     <div class="plans-header fade-up">
       <div class="plans-title">Subscription</div>
       <div class="plans-sub">Buy once, access all servers</div>
@@ -1115,7 +1098,7 @@
 
       <div class="plan-card popular fade-up delay-3">
         <div class="popular-tag">Most Popular</div>
-        <div class="plan-name" style="margin-top:8px">Pro</div>
+        <div class="plan-name" style="margin-top:28px">Pro</div>
         <div class="plan-price-row">
           <div class="plan-price" id="plan-price">$4.99</div>
           <div class="plan-period" id="plan-period">/ mo</div>
@@ -1154,8 +1137,6 @@
 
   <!-- ════════════ PROFILE ════════════ -->
   <div class="screen" id="screen-profile">
-    <div class="status-bar"><span>9:41</span></div>
-
     <div class="profile-header fade-up">
       <div class="profile-avatar">M</div>
       <div class="profile-name">Michael</div>
@@ -1167,11 +1148,11 @@
     </div>
 
     <div class="sub-card fade-up delay-1">
-      <div class="sub-card-title">Active Subscription</div>
-      <div class="sub-card-plan">Pro — 3 Months</div>
-      <div class="sub-card-exp">Expires: Sep 6, 2025</div>
-      <div class="sub-card-progress"><div class="sub-card-progress-fill"></div></div>
-      <div class="sub-card-days">62 days remaining</div>
+      <div class="sub-card-title" style="font-size:13px;opacity:0.85;margin-bottom:8px">اشتراک فعال</div>
+      <div class="sub-card-plan" style="font-size:20px;font-weight:800">Pro — 3 ماهه</div>
+      <div class="sub-card-exp" style="margin-top:6px;opacity:0.8">انقضا: ۶ شهریور ۱۴۰۴</div>
+      <div class="sub-card-progress" style="margin-top:12px"><div class="sub-card-progress-fill"></div></div>
+      <div class="sub-card-days" style="margin-top:6px;opacity:0.75">۶۲ روز باقی‌مانده</div>
     </div>
 
     <div class="profile-section fade-up delay-2">
