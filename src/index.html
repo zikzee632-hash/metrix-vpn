@@ -2245,6 +2245,7 @@ function toggleTheme() {
       btn.classList.remove('light-active');
     }
     mapUpdateTheme();
+    if (typeof setSystemBars === 'function') setSystemBars(isLight);
     ripple.style.transition = 'opacity 0.2s';
     ripple.style.opacity = '0';
     setTimeout(() => ripple.remove(), 220);
@@ -2697,17 +2698,20 @@ function setProtocol(name) {
   <!-- Capacitor Bridge -->
   <script src="capacitor.js"></script>
   <script>
+    async function setSystemBars(light) {
+      if (!window.Capacitor) return;
+      const { StatusBar } = window.Capacitor.Plugins;
+      if (!StatusBar) return;
+      const color = light ? '#F0F2FF' : '#07080F';
+      const style = light ? 'LIGHT' : 'DARK';
+      try { await StatusBar.setBackgroundColor({ color }); } catch(e) {}
+      try { await StatusBar.setStyle({ style }); } catch(e) {}
+      try { await StatusBar.setNavigationBarColor({ color }); } catch(e) {}
+    }
+
     window.addEventListener('load', async () => {
       if (!window.Capacitor) return;
-
-      // Status bar dark
-      try {
-        const { StatusBar } = window.Capacitor.Plugins;
-        await StatusBar.setStyle({ style: 'DARK' });
-        await StatusBar.setBackgroundColor({ color: '#07080F' });
-      } catch(e) {}
-
-      // Hide splash screen
+      await setSystemBars(false);
       try {
         const { SplashScreen } = window.Capacitor.Plugins;
         setTimeout(() => SplashScreen.hide(), 300);
