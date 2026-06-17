@@ -779,100 +779,188 @@
   .plan-cta.pro-cta:active { transform: scale(0.98); }
 
   /* ── PROFILE SCREEN ── */
-  .profile-header {
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 16px;
+
+  /* banner + avatar overlap */
+  .profile-banner {
+    height: 130px;
+    background: linear-gradient(135deg, #3730a3 0%, #1e40af 50%, #0369a1 100%);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .profile-banner::after {
+    content:'';
+    position:absolute;
+    bottom:-1px; left:0; right:0;
+    height: 30px;
+    background: var(--bg);
+    border-radius: 30px 30px 0 0;
+  }
+  .profile-avatar-wrap {
+    position: absolute;
+    bottom: -36px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
   }
   .profile-avatar {
     width: 72px; height: 72px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     display: flex; align-items: center; justify-content: center;
-    font-size: 28px; font-weight: 700;
-    box-shadow: 0 0 0 4px rgba(108,99,255,0.15);
+    font-size: 26px; font-weight: 700; color: #fff;
+    border: 3px solid var(--bg);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
   }
-  .profile-name { font-size: var(--text-lg); font-weight: 700; }
-  .profile-email { font-size: 13px; color: var(--muted); }
+  .profile-edit-btn {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .profile-edit-btn svg { width:10px; height:10px; color:#fff; }
+
+  .profile-info {
+    text-align: center;
+    padding: 44px 20px 16px;
+  }
+  .profile-name { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .profile-email { font-size: 13px; color: var(--muted); margin-top: 3px; }
   .profile-plan-badge {
-    font-size: 12px;
-    font-weight: 700;
-    padding: 5px 14px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 12px;
     border-radius: 20px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     color: #fff;
     letter-spacing: 0.5px;
+    margin-top: 8px;
   }
 
-  .profile-section { padding: 0 var(--space-md) 12px; }
-  .profile-section-title {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    letter-spacing: 1px;
-    margin-bottom: 10px;
+  /* quick stats */
+  .profile-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 0 20px 16px;
   }
-  .profile-items { display: flex; flex-direction: column; gap: 2px; }
-  .profile-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .profile-item:last-child { border-bottom: none; }
-  .profile-item:hover { padding-right: 4px; }
-  .profile-item-icon {
-    width: 36px; height: 36px;
-    border-radius: 10px;
+  .profile-stat {
     background: var(--card);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 10px;
+    text-align: center;
   }
-  .profile-item-label { flex:1; font-size: 14px; font-weight: 500; }
-  .profile-item-value { font-size: 13px; color: var(--muted); }
-  .profile-item-arrow { color: var(--muted); font-size: 12px; }
+  .profile-stat-val {
+    font-size: 17px; font-weight: 700;
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .profile-stat-lbl {
+    font-size: 10px; color: var(--muted);
+    font-weight: 500; margin-top: 3px;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
 
   /* subscription card */
   .sub-card {
-    margin: 0 var(--space-md) 20px;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-    border-radius: var(--radius);
-    padding: 18px 20px;
+    margin: 0 20px 14px;
+    background: linear-gradient(135deg, #3730a3 0%, #0369a1 100%);
+    border-radius: 18px;
+    padding: 16px 18px;
     position: relative;
     overflow: hidden;
   }
   .sub-card::before {
-    content:'';
-    position:absolute;
+    content:''; position:absolute;
     top:-30px; right:-30px;
-    width:120px; height:120px;
-    border-radius:50%;
-    background: rgba(255,255,255,0.08);
+    width:110px; height:110px; border-radius:50%;
+    background: rgba(255,255,255,0.07);
+    pointer-events:none;
   }
-  .sub-card-title { font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 4px; }
-  .sub-card-plan { font-size: var(--text-lg); font-weight: 800; letter-spacing: -0.5px; }
-  .sub-card-exp { font-size: 12px; opacity: 0.75; margin-top: 6px; }
+  .sub-card-row { display:flex; justify-content:space-between; align-items:flex-start; }
+  .sub-card-title { font-size:11px; font-weight:600; opacity:0.7; text-transform:uppercase; letter-spacing:0.8px; color:#fff; margin-bottom:4px; }
+  .sub-card-plan  { font-size:18px; font-weight:800; color:#fff; letter-spacing:-0.3px; }
+  .sub-card-exp   { font-size:11px; opacity:0.65; color:#fff; margin-top:3px; }
+  .sub-card-days-badge {
+    background: rgba(255,255,255,0.15);
+    color:#fff; font-size:11px; font-weight:700;
+    padding: 4px 10px; border-radius:20px;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+  }
   .sub-card-progress {
-    margin-top: 14px;
-    height: 4px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 2px;
-    overflow: hidden;
+    margin-top:14px; height:4px;
+    background:rgba(255,255,255,0.18); border-radius:2px; overflow:hidden;
   }
   .sub-card-progress-fill {
-    height: 100%;
-    width: 62%;
-    background: rgba(255,255,255,0.7);
-    border-radius: 2px;
+    height:100%; width:62%;
+    background:rgba(255,255,255,0.75); border-radius:2px;
   }
-  .sub-card-days { font-size: 11px; opacity: 0.7; margin-top: 6px; }
+  .sub-card-upgrade {
+    margin-top:12px;
+    display:flex; align-items:center; justify-content:center;
+    gap:6px;
+    background: rgba(255,255,255,0.12);
+    border-radius:10px; padding:8px;
+    font-size:12px; font-weight:600; color:#fff;
+    cursor:pointer;
+  }
+
+  /* settings group card */
+  .profile-group {
+    margin: 0 20px 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .profile-group-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 12px 16px 6px;
+  }
+  .profile-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  .profile-item:first-of-type { border-top: none; }
+  .profile-item:active { background: rgba(108,99,255,0.05); }
+  .profile-item-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .profile-item-label { flex:1; font-size: 14px; font-weight: 500; }
+  .profile-item-value { font-size: 12px; color: var(--muted); }
+  .profile-item-arrow { color: var(--muted); margin-left: 4px; }
+  .profile-item-arrow svg { width:14px; height:14px; }
+
+  /* sign out */
+  .profile-signout {
+    margin: 4px 20px 20px;
+    background: rgba(255,75,110,0.08);
+    border: 1px solid rgba(255,75,110,0.15);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .profile-signout:active { background: rgba(255,75,110,0.14); }
+  .profile-signout-icon {
+    width:34px; height:34px; border-radius:10px;
+    background: rgba(255,75,110,0.12);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .profile-signout-label { font-size:14px; font-weight:600; color:var(--red); }
 
   /* ── AMBIENT BG ── */
   .ambient {
@@ -1336,92 +1424,128 @@
 
   <!-- ════════════ PROFILE ════════════ -->
   <div class="screen" id="screen-profile">
-    <div class="profile-header fade-up">
-      <div class="profile-avatar">M</div>
+    <div class="screen-content">
+
+    <!-- banner + avatar -->
+    <div class="profile-banner fade-up">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar">M</div>
+        <div class="profile-edit-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-info fade-up delay-1">
       <div class="profile-name">Michael</div>
       <div class="profile-email">michael@metrix.vpn</div>
       <div class="profile-plan-badge">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12" style="margin-left:4px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" width="11" height="11"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Pro
       </div>
     </div>
 
-    <div class="sub-card fade-up delay-1">
-      <div class="sub-card-title" style="font-size:13px;opacity:0.85;margin-bottom:8px">اشتراک فعال</div>
-      <div class="sub-card-plan" style="font-size:20px;font-weight:800">Pro — 3 ماهه</div>
-      <div class="sub-card-exp" style="margin-top:6px;opacity:0.8">انقضا: ۶ شهریور ۱۴۰۴</div>
-      <div class="sub-card-progress" style="margin-top:12px"><div class="sub-card-progress-fill"></div></div>
-      <div class="sub-card-days" style="margin-top:6px;opacity:0.75">۶۲ روز باقی‌مانده</div>
-    </div>
-
-    <div class="profile-section fade-up delay-2">
-      <div class="profile-section-title">ACCOUNT</div>
-      <div class="profile-items">
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          </div>
-          <div class="profile-item-label">This Month Usage</div>
-          <div class="profile-item-value">47.3 GB</div>
-          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          </div>
-          <div class="profile-item-label">Change Password</div>
-          <div class="profile-item-value"></div>
-          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-          </div>
-          <div class="profile-item-label">Connected Devices</div>
-          <div class="profile-item-value">2 of 3</div>
-          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
+    <!-- quick stats -->
+    <div class="profile-stats fade-up delay-2">
+      <div class="profile-stat">
+        <div class="profile-stat-val">47.3<span style="font-size:11px;font-weight:400;color:var(--muted)"> GB</span></div>
+        <div class="profile-stat-lbl">Used</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val" style="color:var(--green)">62</div>
+        <div class="profile-stat-lbl">Days Left</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val">2<span style="font-size:11px;font-weight:400;color:var(--muted)">/3</span></div>
+        <div class="profile-stat-lbl">Devices</div>
       </div>
     </div>
 
-    <div class="profile-section fade-up delay-3">
-      <div class="profile-section-title">SETTINGS</div>
-      <div class="profile-items">
-        <div class="profile-item" onclick="openLangModal()">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>
-          </div>
-          <div class="profile-item-label" data-i18n="language">Language</div>
-          <div class="profile-item-value" id="current-lang-label">English</div>
-          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <!-- subscription card -->
+    <div class="sub-card fade-up delay-2">
+      <div class="sub-card-row">
+        <div>
+          <div class="sub-card-title">Active Subscription</div>
+          <div class="sub-card-plan">Pro — 3 Months</div>
+          <div class="sub-card-exp">Expires Sep 6, 2025</div>
         </div>
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-          </div>
-          <div class="profile-item-label" data-i18n="protocol">Protocol</div>
-          <div class="profile-item-value">VLESS</div>
-          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
-        <div class="profile-item">
-          <div class="profile-item-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-          </div>
-          <div class="profile-item-label">Notifications</div>
-          <div class="profile-item-value">Enabled</div>
-          <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>
-        <div class="profile-item" style="color:var(--red)">
-          <div class="profile-item-icon" style="background:rgba(255,75,110,0.08)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" width="18" height="18"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          </div>
-          <div class="profile-item-label" style="color:var(--red)">Sign Out</div>
-          <div class="profile-item-value"></div>
-        </div>
+        <div class="sub-card-days-badge">62 days</div>
+      </div>
+      <div class="sub-card-progress"><div class="sub-card-progress-fill"></div></div>
+      <div class="sub-card-upgrade" onclick="navigate('plans')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
+        Upgrade Plan
       </div>
     </div>
 
-    <div class="spacer"></div>
+    <!-- account group -->
+    <div class="profile-group fade-up delay-3">
+      <div class="profile-group-title">Account</div>
+      <div class="profile-item">
+        <div class="profile-item-icon" style="background:rgba(108,99,255,0.12)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="17" height="17"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="profile-item-label" id="pi-usage">This Month Usage</div>
+        <div class="profile-item-value">47.3 GB</div>
+        <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="profile-item">
+        <div class="profile-item-icon" style="background:rgba(0,212,255,0.1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="1.8" width="17" height="17"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <div class="profile-item-label" id="pi-pass">Change Password</div>
+        <div class="profile-item-value"></div>
+        <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="profile-item">
+        <div class="profile-item-icon" style="background:rgba(0,229,160,0.1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" width="17" height="17"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </div>
+        <div class="profile-item-label" id="pi-devices">Connected Devices</div>
+        <div class="profile-item-value">2 of 3</div>
+        <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+    </div>
+
+    <!-- settings group -->
+    <div class="profile-group fade-up delay-3">
+      <div class="profile-group-title">Settings</div>
+      <div class="profile-item" onclick="openLangModal()">
+        <div class="profile-item-icon" style="background:rgba(255,165,0,0.1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FFA500" stroke-width="1.8" width="17" height="17"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>
+        </div>
+        <div class="profile-item-label" id="pi-lang">Language</div>
+        <div class="profile-item-value" id="current-lang-label">English</div>
+        <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="profile-item">
+        <div class="profile-item-icon" style="background:rgba(108,99,255,0.1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="17" height="17"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div class="profile-item-label" id="pi-protocol">Protocol</div>
+        <div class="profile-item-value">VLESS</div>
+        <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="profile-item">
+        <div class="profile-item-icon" style="background:rgba(0,229,160,0.08)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" width="17" height="17"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <div class="profile-item-label" id="pi-notif">Notifications</div>
+        <div class="profile-item-value" id="pi-notif-val">Enabled</div>
+        <div class="profile-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+    </div>
+
+    <!-- sign out -->
+    <div class="profile-signout fade-up delay-4">
+      <div class="profile-signout-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" width="17" height="17"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </div>
+      <div class="profile-signout-label" id="pi-signout">Sign Out</div>
+    </div>
+
+    <div style="height:8px"></div>
+    </div><!-- /screen-content -->
 
     <div class="bottom-nav">
       <button class="nav-item" onclick="navigate('home')">
@@ -2010,26 +2134,20 @@ function applyLang(code) {
   const pname = document.querySelector('.profile-name');
   if (pname) pname.textContent = t.michael;
 
-  // profile section titles
-  const secTitles = document.querySelectorAll('.profile-section-title');
-  if (secTitles[0]) secTitles[0].textContent = t.account;
-  if (secTitles[1]) secTitles[1].textContent = t.settings;
+  // profile item labels (new IDs)
+  const piMap = {
+    'pi-usage': t.usage, 'pi-pass': t.changePass, 'pi-devices': t.devicesConnected,
+    'pi-lang': t.language, 'pi-protocol': t.protocol,
+    'pi-notif': t.notifications, 'pi-notif-val': t.enabled,
+    'pi-signout': t.logout,
+  };
+  Object.entries(piMap).forEach(([id, val]) => { const el=document.getElementById(id); if(el&&val) el.textContent=val; });
 
-  // profile item labels
-  const itemLabels = document.querySelectorAll('.profile-item-label');
-  const itemKeys = ['usage','changePass','devicesConnected','language','protocol','notifications','logout'];
-  itemLabels.forEach((el, i) => { if (itemKeys[i]) el.textContent = t[itemKeys[i]]; });
-
-  // notifications value
-  const itemVals = document.querySelectorAll('.profile-item-value');
-  if (itemVals[3]) itemVals[3].textContent = langNames[code];
-  if (itemVals[5]) itemVals[5].textContent = t.enabled;
-
-  // current lang label in settings
+  // current lang label
   const cll = document.getElementById('current-lang-label');
   if (cll) cll.textContent = langNames[code];
 
-  // sub card
+  // sub card title
   const subTitle = document.querySelector('.sub-card-title');
   if (subTitle) subTitle.textContent = t.activeSubscription;
 
