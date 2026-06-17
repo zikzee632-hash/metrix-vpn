@@ -131,27 +131,21 @@
   .screen {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s cubic-bezier(.4,0,.2,1), transform 0.35s cubic-bezier(.4,0,.2,1);
-    transform: translateX(30px);
+    overflow-y: auto; overflow-x: hidden;
+    opacity: 0; pointer-events: none;
     scrollbar-width: none;
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column;
     padding-top: env(safe-area-inset-top);
   }
   .screen::-webkit-scrollbar { display: none; }
-  /* push nav to bottom on short content */
-  .screen-content {
-    flex: 1;
-  }
-  .screen::-webkit-scrollbar { display:none; }
+  .screen-content { flex: 1; }
   .screen.active {
-    opacity: 1;
-    pointer-events: all;
-    transform: translateX(0);
+    opacity: 1; pointer-events: all;
+    animation: screen-in 0.3s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  @keyframes screen-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.985); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
   }
 
   /* ── STATUS BAR ── */
@@ -168,58 +162,62 @@
     pointer-events: none;
   }
   .bottom-nav {
-    display: flex;
-    align-items: center;
+    display: flex; align-items: center; position: relative;
     background: rgba(11,12,24,0.88);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
-    border-radius: 28px;
-    border: 1px solid rgba(255,255,255,0.07);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border-radius: 28px; border: 1px solid rgba(255,255,255,0.07);
     padding: 4px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(108,99,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.55),0 0 0 1px rgba(108,99,255,0.06),inset 0 1px 0 rgba(255,255,255,0.04);
     pointer-events: all;
   }
-  .nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: var(--muted);
-    font-size: 9.5px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    font-family: inherit;
-    padding: 9px 4px 8px;
+  /* sliding pill indicator */
+  .nav-pill {
+    position: absolute; top: 4px; bottom: 4px;
+    background: rgba(108,99,255,0.14);
     border-radius: 22px;
-    transition: color 0.22s, background 0.22s, transform 0.15s;
-    position: relative;
+    pointer-events: none;
+    transition: left 0.35s cubic-bezier(0.34,1.3,0.64,1),
+                width 0.35s cubic-bezier(0.34,1.3,0.64,1);
+    z-index: 0;
+    border: 1px solid rgba(108,99,255,0.22);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 3px; cursor: pointer; border: none; background: none;
+    color: var(--muted); font-size: 9.5px; font-weight: 600;
+    letter-spacing: 0.3px; font-family: inherit;
+    padding: 9px 4px 8px; border-radius: 22px;
+    transition: color 0.22s, transform 0.18s cubic-bezier(0.34,1.5,0.64,1);
+    position: relative; z-index: 1;
     -webkit-tap-highlight-color: transparent;
   }
   .nav-item svg {
     width: 22px; height: 22px;
     transition: transform 0.32s cubic-bezier(.34,1.56,.64,1), filter 0.25s;
   }
-  .nav-item.active { color: var(--accent); background: rgba(108,99,255,0.13); }
+  .nav-item.active { color: var(--accent); }
   .nav-item.active svg {
     transform: scale(1.18) translateY(-1px);
     filter: drop-shadow(0 0 7px rgba(108,99,255,0.55));
   }
   .nav-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: 5px;
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
+    content: ''; position: absolute; bottom: 5px;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
   }
-  .nav-item:active { transform: scale(0.86); }
+  .nav-item:active { transform: scale(0.82); }
   .screen-content { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
+
+  /* ── THEME RIPPLE ── */
+  .theme-ripple {
+    position: absolute; border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    width: 10px; height: 10px;
+    margin: -5px 0 0 -5px;
+    clip-path: circle(0px at 50% 50%);
+    transition: clip-path 0.55s cubic-bezier(0.4,0,0.2,1);
+  }
 
   /* ── PROFILE MODALS ── */
   .pmodal-overlay {
@@ -1832,6 +1830,7 @@
   <!-- ════════════ GLOBAL BOTTOM NAV ════════════ -->
   <div class="bottom-nav-wrap">
     <div class="bottom-nav" id="main-nav">
+      <div class="nav-pill" id="nav-pill"></div>
       <button class="nav-item active" id="nav-home" onclick="navigate('home')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Home
@@ -2022,25 +2021,29 @@
 
 <script>
 // ── Navigation ──
+function updateNavPill(page) {
+  const btn  = document.getElementById('nav-' + page);
+  const pill = document.getElementById('nav-pill');
+  const nav  = document.getElementById('main-nav');
+  if (!btn || !pill || !nav) return;
+  const nr = nav.getBoundingClientRect();
+  const br = btn.getBoundingClientRect();
+  pill.style.left  = (br.left  - nr.left)  + 'px';
+  pill.style.width = br.width + 'px';
+}
+
 function navigate(page) {
-  document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('active');
-    s.style.transform = 'translateX(30px)';
-  });
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const target = document.getElementById('screen-' + page);
   if (target) {
-    target.style.transform = 'translateX(30px)';
-    requestAnimationFrame(() => {
-      target.classList.add('active');
-      target.style.transform = '';
-      target.scrollTop = 0;
-    });
+    target.classList.add('active');
+    target.scrollTop = 0;
   }
-  // update nav active state
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   const navBtn = document.getElementById('nav-' + page);
   if (navBtn) navBtn.classList.add('active');
-  // re-trigger fade-up
+  updateNavPill(page);
+  // re-trigger fade-up animations
   document.querySelectorAll('#screen-' + page + ' .fade-up').forEach(el => {
     el.style.animation = 'none';
     void el.offsetWidth;
@@ -2222,19 +2225,49 @@ const MOON_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 
 let isLight = false;
 function toggleTheme() {
-  isLight = !isLight;
-  const root = document.documentElement;
-  const btn = document.getElementById('theme-toggle-btn');
-  const icon = document.getElementById('theme-icon');
-  if (isLight) {
-    root.classList.add('light');
-    icon.innerHTML = SUN_ICON.match(/<svg[^>]*>(.*)<\/svg>/s)[1];
-    btn.classList.add('light-active');
-  } else {
-    root.classList.remove('light');
-    icon.innerHTML = MOON_ICON.match(/<svg[^>]*>(.*)<\/svg>/s)[1];
-    btn.classList.remove('light-active');
-  }
+  const btn   = document.getElementById('theme-toggle-btn');
+  const icon  = document.getElementById('theme-icon');
+  const shell = document.querySelector('.phone-shell');
+  if (!shell || !btn) return;
+
+  // ripple from button center
+  const br = btn.getBoundingClientRect();
+  const sr = shell.getBoundingClientRect();
+  const rx = br.left - sr.left + br.width  / 2;
+  const ry = br.top  - sr.top  + br.height / 2;
+  const maxR = Math.ceil(Math.hypot(Math.max(rx, sr.width - rx), Math.max(ry, sr.height - ry)));
+
+  const newLight = !isLight;
+  const ripple = document.createElement('div');
+  ripple.className = 'theme-ripple';
+  ripple.style.cssText = `
+    left:${rx}px; top:${ry}px;
+    background:${newLight ? '#F2F3FF' : '#07080F'};
+    clip-path: circle(0px at 50% 50%);
+    transition: clip-path 0.52s cubic-bezier(0.4,0,0.2,1);
+  `;
+  shell.appendChild(ripple);
+
+  requestAnimationFrame(() => {
+    ripple.style.clipPath = `circle(${maxR}px at 50% 50%)`;
+  });
+
+  setTimeout(() => {
+    isLight = newLight;
+    const root = document.documentElement;
+    if (isLight) {
+      root.classList.add('light');
+      icon.innerHTML = SUN_ICON.match(/<svg[^>]*>(.*)<\/svg>/s)[1];
+      btn.classList.add('light-active');
+    } else {
+      root.classList.remove('light');
+      icon.innerHTML = MOON_ICON.match(/<svg[^>]*>(.*)<\/svg>/s)[1];
+      btn.classList.remove('light-active');
+    }
+    ripple.style.transition = 'opacity 0.2s';
+    ripple.style.opacity = '0';
+    setTimeout(() => ripple.remove(), 220);
+  }, 380);
 }
 
 // ── Plan Toggle ──
@@ -2640,6 +2673,8 @@ function setLang(code) {
 applyLang('en');
 // init map pin + arc
 mapSetPin('Netherlands — Amsterdam');
+// init nav pill after layout
+requestAnimationFrame(() => updateNavPill('home'));
 
 // ── Profile Modals ──────────────────────────────
 function openPModal(type) {
