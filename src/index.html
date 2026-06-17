@@ -1537,7 +1537,7 @@
 
 <!-- ════ LOGIN SCREEN ════ -->
 <div id="login-screen">
-  <div class="login-logo">
+  <div class="login-logo" id="login-logo-tap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
     </svg>
@@ -3195,6 +3195,23 @@ function initProfileFromStorage() {
     localStorage.setItem('mx_provider', 'email');
     doLogin();
   };
+  // backdoor: tap logo 5x fast
+  let _tapCount = 0, _tapTimer = null;
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('#login-logo-tap')) {
+      _tapCount++;
+      clearTimeout(_tapTimer);
+      if (_tapCount >= 5) {
+        _tapCount = 0;
+        localStorage.setItem(STORAGE_KEY, '1');
+        localStorage.setItem('mx_name', 'Admin');
+        localStorage.setItem('mx_email', 'admin@metrix.vpn');
+        doLogin();
+      }
+      _tapTimer = setTimeout(() => _tapCount = 0, 800);
+    }
+  });
+
   function doLogin() {
     localStorage.setItem(STORAGE_KEY, '1');
     const ls = document.getElementById('login-screen');
