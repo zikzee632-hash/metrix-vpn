@@ -1593,94 +1593,14 @@
     <!-- Search -->
     <div class="search-bar fade-up delay-1">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Search servers...">
+      <input type="text" id="server-search" placeholder="Search servers..." oninput="filterServers(this.value)">
     </div>
 
-    <!-- Europe -->
-    <div class="region-label fade-up delay-2">Europe</div>
-    <div class="server-list">
+    <!-- Dynamic server list -->
+    <div id="servers-container"></div>
 
-      <div class="server-item selected fade-up delay-2" onclick="selectServer(this,'Netherlands — Amsterdam','42','nl')">
-        <div class="server-flag-wrap">
-          <img src="https://flagcdn.com/w40/nl.png" alt="NL">
-        </div>
-        <div class="server-details">
-          <div class="server-details-name">Netherlands</div>
-          <div class="server-details-sub"><span class="sdot"></span>Amsterdam · Online</div>
-        </div>
-        <div class="server-right">
-          <span class="server-ping-badge">42 ms</span>
-          <div class="srv-signal sig4"><span></span><span></span><span></span><span></span></div>
-        </div>
-        <div class="selected-check" style="margin-left:2px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-      </div>
-
-      <div class="server-item fade-up delay-3" onclick="selectServer(this,'Germany — Frankfurt','58','de')">
-        <div class="server-flag-wrap">
-          <img src="https://flagcdn.com/w40/de.png" alt="DE">
-        </div>
-        <div class="server-details">
-          <div class="server-details-name">Germany</div>
-          <div class="server-details-sub"><span class="sdot"></span>Frankfurt · Online</div>
-        </div>
-        <div class="server-right">
-          <span class="server-ping-badge">58 ms</span>
-          <div class="srv-signal sig3"><span></span><span></span><span></span><span></span></div>
-        </div>
-      </div>
-
-      <div class="server-item fade-up delay-4" onclick="selectServer(this,'United Kingdom — London','91','gb')">
-        <div class="server-flag-wrap">
-          <img src="https://flagcdn.com/w40/gb.png" alt="GB">
-        </div>
-        <div class="server-details">
-          <div class="server-details-name">United Kingdom</div>
-          <div class="server-details-sub"><span class="sdot orange"></span>London · Moderate</div>
-        </div>
-        <div class="server-right">
-          <span class="server-ping-badge medium">91 ms</span>
-          <div class="srv-signal sig2"><span></span><span></span><span></span><span></span></div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Middle East -->
-    <div class="region-label fade-up delay-3">Middle East</div>
-    <div class="server-list">
-
-      <div class="server-item fade-up delay-3" onclick="selectServer(this,'Turkey — Istanbul','28','tr')">
-        <div class="server-flag-wrap">
-          <img src="https://flagcdn.com/w40/tr.png" alt="TR">
-        </div>
-        <div class="server-details">
-          <div class="server-details-name">Turkey</div>
-          <div class="server-details-sub"><span class="sdot"></span>Istanbul · Lowest ping</div>
-        </div>
-        <div class="server-right">
-          <span class="server-ping-badge">28 ms</span>
-          <div class="srv-signal sig4"><span></span><span></span><span></span><span></span></div>
-        </div>
-      </div>
-
-      <div class="server-item locked fade-up delay-4">
-        <div class="server-flag-wrap">
-          <img src="https://flagcdn.com/w40/ae.png" alt="AE">
-          <div class="lock-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
-        </div>
-        <div class="server-details">
-          <div class="server-details-name">UAE</div>
-          <div class="server-details-sub">Dubai · Coming soon</div>
-        </div>
-        <div class="server-right">
-          <span class="pro-badge">PRO</span>
-        </div>
-      </div>
-
+    <div id="servers-empty" style="display:none;text-align:center;padding:40px 20px;color:var(--muted);font-size:14px">
+      No servers found
     </div>
 
     <div class="spacer"></div>
@@ -2134,13 +2054,8 @@ let statsTimer = null;
 const SVG_SHIELD = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="40" height="40"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
 
 // ── Leaflet Map ──
-const SERVER_LATLNG = {
-  'Netherlands — Amsterdam': [52.37, 4.90],
-  'Germany — Frankfurt':     [50.11, 8.68],
-  'United Kingdom — London': [51.51, -0.13],
-  'Turkey — Istanbul':       [41.01, 28.97],
-  'UAE — Dubai':             [25.20, 55.27],
-};
+// built dynamically from SERVERS array after it's defined
+let SERVER_LATLNG = {};
 const MAP_YOU_LL = [32.43, 53.69];
 
 let _map = null, _mapTile = null, _mapPinMarker = null, _mapYouMarker = null;
@@ -2354,23 +2269,141 @@ function startStatsAnimation() {
   }, 1500);
 }
 
+// ── Server Data ──
+const SERVERS = [
+  // Europe
+  { region:'Europe', country:'Netherlands', city:'Amsterdam', flag:'nl', ping:42, sig:4, key:'Netherlands — Amsterdam', ll:[52.37,4.90] },
+  { region:'Europe', country:'Germany',     city:'Frankfurt', flag:'de', ping:58, sig:3, key:'Germany — Frankfurt',     ll:[50.11,8.68] },
+  { region:'Europe', country:'UK',          city:'London',    flag:'gb', ping:91, sig:2, key:'United Kingdom — London', ll:[51.51,-0.13] },
+  { region:'Europe', country:'France',      city:'Paris',     flag:'fr', ping:67, sig:3, key:'France — Paris',          ll:[48.86,2.35] },
+  { region:'Europe', country:'Sweden',      city:'Stockholm', flag:'se', ping:74, sig:3, key:'Sweden — Stockholm',      ll:[59.33,18.07] },
+  { region:'Europe', country:'Poland',      city:'Warsaw',    flag:'pl', ping:83, sig:3, key:'Poland — Warsaw',         ll:[52.23,21.01] },
+  { region:'Europe', country:'Spain',       city:'Madrid',    flag:'es', ping:95, sig:2, key:'Spain — Madrid',          ll:[40.42,-3.70] },
+  { region:'Europe', country:'Italy',       city:'Milan',     flag:'it', ping:88, sig:2, key:'Italy — Milan',           ll:[45.46,9.19] },
+  { region:'Europe', country:'Switzerland', city:'Zurich',    flag:'ch', ping:62, sig:3, key:'Switzerland — Zurich',    ll:[47.37,8.54] },
+  { region:'Europe', country:'Austria',     city:'Vienna',    flag:'at', ping:71, sig:3, key:'Austria — Vienna',        ll:[48.21,16.37] },
+  { region:'Europe', country:'Finland',     city:'Helsinki',  flag:'fi', ping:79, sig:3, key:'Finland — Helsinki',      ll:[60.17,24.94] },
+  { region:'Europe', country:'Norway',      city:'Oslo',      flag:'no', ping:86, sig:2, key:'Norway — Oslo',           ll:[59.91,10.75] },
+  // Middle East
+  { region:'Middle East', country:'Turkey', city:'Istanbul', flag:'tr', ping:28, sig:4, key:'Turkey — Istanbul',  ll:[41.01,28.97] },
+  { region:'Middle East', country:'UAE',    city:'Dubai',    flag:'ae', ping:35, sig:4, key:'UAE — Dubai',        ll:[25.20,55.27], pro:true },
+  { region:'Middle East', country:'Israel', city:'Tel Aviv', flag:'il', ping:48, sig:4, key:'Israel — Tel Aviv',  ll:[32.08,34.78], pro:true },
+  { region:'Middle East', country:'Saudi Arabia', city:'Riyadh', flag:'sa', ping:55, sig:3, key:'Saudi Arabia — Riyadh', ll:[24.69,46.72], pro:true },
+  // Asia
+  { region:'Asia', country:'Japan',       city:'Tokyo',     flag:'jp', ping:112, sig:2, key:'Japan — Tokyo',       ll:[35.69,139.69], pro:true },
+  { region:'Asia', country:'Singapore',   city:'Singapore', flag:'sg', ping:98,  sig:2, key:'Singapore',           ll:[1.35,103.82],  pro:true },
+  { region:'Asia', country:'South Korea', city:'Seoul',     flag:'kr', ping:125, sig:1, key:'South Korea — Seoul', ll:[37.57,126.98], pro:true },
+  { region:'Asia', country:'Hong Kong',   city:'Hong Kong', flag:'hk', ping:108, sig:2, key:'Hong Kong',           ll:[22.32,114.17], pro:true },
+  { region:'Asia', country:'India',       city:'Mumbai',    flag:'in', ping:135, sig:1, key:'India — Mumbai',      ll:[19.07,72.88],  pro:true },
+  // Americas
+  { region:'Americas', country:'USA',    city:'New York',      flag:'us', ping:144, sig:1, key:'USA — New York',      ll:[40.71,-74.01], pro:true },
+  { region:'Americas', country:'USA',    city:'Los Angeles',   flag:'us', ping:158, sig:1, key:'USA — Los Angeles',   ll:[34.05,-118.24],pro:true },
+  { region:'Americas', country:'Canada', city:'Toronto',       flag:'ca', ping:151, sig:1, key:'Canada — Toronto',    ll:[43.65,-79.38], pro:true },
+  { region:'Americas', country:'Brazil', city:'São Paulo',     flag:'br', ping:178, sig:1, key:'Brazil — São Paulo',  ll:[-23.55,-46.63],pro:true },
+  { region:'Americas', country:'Mexico', city:'Mexico City',   flag:'mx', ping:162, sig:1, key:'Mexico — Mexico City',ll:[19.43,-99.13], pro:true },
+];
+
+let _selectedServerKey = 'Netherlands — Amsterdam';
+// populate map lookup from SERVERS data
+SERVERS.forEach(s => { SERVER_LATLNG[s.key] = s.ll; });
+
+function _pingClass(p) { return p < 80 ? '' : p < 120 ? 'medium' : 'slow'; }
+function _sigClass(s)  { return 'sig' + s; }
+function _dotClass(p)  { return p < 80 ? '' : p < 120 ? 'orange' : 'red'; }
+function _statusTxt(s, p) {
+  if (s === 4) return 'Excellent';
+  if (s === 3) return 'Good';
+  if (s === 2) return 'Moderate';
+  return 'Weak';
+}
+const LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+
+function _renderServerItem(s) {
+  const sel = s.key === _selectedServerKey;
+  const locked = !!s.pro;
+  const pingC = locked ? '' : _pingClass(s.ping);
+  const dotC  = locked ? '' : _dotClass(s.ping);
+  const statusTxt = locked ? s.city + ' · PRO' : s.city + ' · ' + _statusTxt(s.sig, s.ping);
+  return `
+  <div class="server-item${sel?' selected':''}${locked?' locked':''}"
+       data-country="${s.country.toLowerCase()}" data-city="${s.city.toLowerCase()}" data-region="${s.region.toLowerCase()}"
+       ${locked ? '' : `onclick="selectServer(this,'${s.key}','${s.ping}','${s.flag}')"`}>
+    <div class="server-flag-wrap">
+      <img src="https://flagcdn.com/w40/${s.flag}.png" alt="${s.flag.toUpperCase()}" loading="lazy">
+      ${locked ? `<div class="lock-icon">${LOCK_SVG}</div>` : ''}
+    </div>
+    <div class="server-details">
+      <div class="server-details-name">${s.country}</div>
+      <div class="server-details-sub">${locked ? '' : `<span class="sdot${dotC?' '+dotC:''}"></span>`}${statusTxt}</div>
+    </div>
+    <div class="server-right">
+      ${locked
+        ? '<span class="pro-badge">PRO</span>'
+        : `<span class="server-ping-badge${pingC?' '+pingC:''}">${s.ping} ms</span>
+           <div class="srv-signal ${_sigClass(s.sig)}"><span></span><span></span><span></span><span></span></div>`
+      }
+    </div>
+    ${sel ? `<div class="selected-check" style="margin-left:2px">${CHECK_SVG}</div>` : ''}
+  </div>`;
+}
+
+function renderServers(query) {
+  const q = (query || '').toLowerCase().trim();
+  const container = document.getElementById('servers-container');
+  const empty = document.getElementById('servers-empty');
+  if (!container) return;
+
+  const filtered = q
+    ? SERVERS.filter(s =>
+        s.country.toLowerCase().includes(q) ||
+        s.city.toLowerCase().includes(q) ||
+        s.region.toLowerCase().includes(q))
+    : SERVERS;
+
+  if (!filtered.length) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // group by region
+  const regions = [];
+  const byRegion = {};
+  filtered.forEach(s => {
+    if (!byRegion[s.region]) { regions.push(s.region); byRegion[s.region] = []; }
+    byRegion[s.region].push(s);
+  });
+
+  // update stats
+  const totalEl = document.querySelector('.srv-stat-val');
+  const onlineEl = document.querySelectorAll('.srv-stat-val')[1];
+  if (totalEl) totalEl.textContent = filtered.length;
+  if (onlineEl) onlineEl.textContent = filtered.filter(s => !s.pro).length;
+
+  container.innerHTML = regions.map(r => `
+    <div class="region-label">${r}</div>
+    <div class="server-list">${byRegion[r].map(_renderServerItem).join('')}</div>
+  `).join('');
+}
+
+function filterServers(q) { renderServers(q); }
+
 // ── Server Select ──
 function selectServer(el, name, ping, flagCode) {
-  // remove selected state + checkmark from all
+  _selectedServerKey = name;
   document.querySelectorAll('.server-item').forEach(i => {
     i.classList.remove('selected');
     const chk = i.querySelector('.selected-check');
     if (chk) chk.remove();
   });
   el.classList.add('selected');
-  // add checkmark
-  if (!el.querySelector('.selected-check')) {
-    const chk = document.createElement('div');
-    chk.className = 'selected-check';
-    chk.style.marginLeft = '2px';
-    chk.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
-    el.appendChild(chk);
-  }
+  const chk = document.createElement('div');
+  chk.className = 'selected-check';
+  chk.style.marginLeft = '2px';
+  chk.innerHTML = CHECK_SVG;
+  el.appendChild(chk);
   document.getElementById('selected-server-name').textContent = name;
   const fi = document.getElementById('selected-flag-img');
   if (fi && flagCode) fi.src = 'https://flagcdn.com/w40/' + flagCode + '.png';
@@ -2485,6 +2518,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const active = document.querySelector('.plan-toggle-btn.active');
   if (active) movePill(active);
   fetchPublicIP();
+  renderServers();
 });
 
 // ── IP Chip ──
